@@ -7,8 +7,11 @@ import android.graphics.PointF;
 
 import com.tutorial.androidgametutorial.entities.Character;
 import com.tutorial.androidgametutorial.entities.GameCharacters;
+import com.tutorial.androidgametutorial.entities.Player;
 import com.tutorial.androidgametutorial.environments.GameMap;
 import com.tutorial.androidgametutorial.helpers.GameConstants;
+import com.tutorial.androidgametutorial.helpers.HelpMethods;
+import com.tutorial.androidgametutorial.main.Game;
 
 import java.util.Random;
 
@@ -37,10 +40,26 @@ public class Skeleton extends Character {
         }
     }
 
-    public void prepareAttack() {
+    public void prepareAttack(Player player, float cameraX, float cameraY) {
         timerBeforeAttack = System.currentTimeMillis();
         preparingAttack = true;
         moving = false;
+        turnTowardsPlayer(player, cameraX, cameraY);
+    }
+
+    private void turnTowardsPlayer(Player player, float cameraX, float cameraY) {
+        float xDelta = hitbox.left - (player.getHitbox().left - cameraX);
+        float yDelta = hitbox.top - (player.getHitbox().top - cameraY);
+
+        if (Math.abs(xDelta) > Math.abs(yDelta)) {
+            if (hitbox.left < (player.getHitbox().left - cameraX))
+                faceDir = GameConstants.Face_Dir.RIGHT;
+            else faceDir = GameConstants.Face_Dir.LEFT;
+        } else {
+            if (hitbox.top < (player.getHitbox().top - cameraY))
+                faceDir = GameConstants.Face_Dir.DOWN;
+            else faceDir = GameConstants.Face_Dir.UP;
+        }
     }
 
     private void updateAttackTimer() {
@@ -65,29 +84,39 @@ public class Skeleton extends Character {
             lastDirChange = System.currentTimeMillis();
         }
 
+        float deltaChange = (float) (delta * 300);
+
         switch (faceDir) {
             case GameConstants.Face_Dir.DOWN:
-                hitbox.top += delta * 300;
-                hitbox.bottom += delta * 300;
-                if (hitbox.bottom >= gameMap.getMapHeight()) faceDir = GameConstants.Face_Dir.UP;
+                if (HelpMethods.CanWalkHere(hitbox, 0, deltaChange, gameMap)) {
+                    hitbox.top += deltaChange;
+                    hitbox.bottom += deltaChange;
+                } else
+                    faceDir = GameConstants.Face_Dir.UP;
                 break;
 
             case GameConstants.Face_Dir.UP:
-                hitbox.top -= delta * 300;
-                hitbox.bottom -= delta * 300;
-                if (hitbox.top <= 0) faceDir = GameConstants.Face_Dir.DOWN;
+                if (HelpMethods.CanWalkHere(hitbox, 0, -deltaChange, gameMap)) {
+                    hitbox.top -= deltaChange;
+                    hitbox.bottom -= deltaChange;
+                } else
+                    faceDir = GameConstants.Face_Dir.DOWN;
                 break;
 
             case GameConstants.Face_Dir.RIGHT:
-                hitbox.left += delta * 300;
-                hitbox.right += delta * 300;
-                if (hitbox.right >= gameMap.getMapWidth()) faceDir = GameConstants.Face_Dir.LEFT;
+                if (HelpMethods.CanWalkHere(hitbox, deltaChange, 0, gameMap)) {
+                    hitbox.left += deltaChange;
+                    hitbox.right += deltaChange;
+                } else
+                    faceDir = GameConstants.Face_Dir.LEFT;
                 break;
 
             case GameConstants.Face_Dir.LEFT:
-                hitbox.left -= delta * 300;
-                hitbox.right -= delta * 300;
-                if (hitbox.left <= 0) faceDir = GameConstants.Face_Dir.RIGHT;
+                if (HelpMethods.CanWalkHere(hitbox, -deltaChange, 0, gameMap)) {
+                    hitbox.left -= deltaChange;
+                    hitbox.right -= deltaChange;
+                } else
+                    faceDir = GameConstants.Face_Dir.RIGHT;
                 break;
         }
     }

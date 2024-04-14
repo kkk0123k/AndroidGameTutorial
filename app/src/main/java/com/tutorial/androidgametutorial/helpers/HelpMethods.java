@@ -250,6 +250,6 @@ public class HelpMethods {
 
         float distance = (float) Math.hypot(xDelta, yDelta);
 
-        return distance < 200;
+        return distance < GameConstants.Sprite.SIZE * 1.5f;
     }
 }

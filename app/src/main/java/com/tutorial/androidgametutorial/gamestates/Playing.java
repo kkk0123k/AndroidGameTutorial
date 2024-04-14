@@ -85,7 +85,7 @@ public class Playing extends BaseState implements GameStateInterface {
                     }
                 } else if (!skeleton.isPreparingAttack()) {
                     if (HelpMethods.IsPlayerCloseForAttack(skeleton, player, cameraY, cameraX)) {
-                        skeleton.prepareAttack();
+                        skeleton.prepareAttack(player,cameraX,cameraY);
                     }
                 }
             }
