@@ -26,7 +26,7 @@ public class HelpMethods {
         float y = building.getPos().y;
         PointF point = gameMapLocatedIn.getBuildingArrayList().get(buildingIndex).getBuildingType().getDoorwayPoint();
 
-        return new PointF(point.x + x, point.y + y);
+        return new PointF(point.x + x, point.y + y - building.getBuildingType().getHitboxRoof());
 
     }
 

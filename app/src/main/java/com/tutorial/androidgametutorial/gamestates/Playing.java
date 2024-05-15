@@ -75,20 +75,20 @@ public class Playing extends BaseState implements GameStateInterface {
 
         if (player.isAttacking()) if (!player.isAttackChecked()) checkPlayerAttack();
 
-
-        for (Skeleton skeleton : mapManager.getCurrentMap().getSkeletonArrayList())
-            if (skeleton.isActive()) {
-                skeleton.update(delta, mapManager.getCurrentMap());
-                if (skeleton.isAttacking()) {
-                    if (!skeleton.isAttackChecked()) {
-                        checkEnemyAttack(skeleton);
-                    }
-                } else if (!skeleton.isPreparingAttack()) {
-                    if (HelpMethods.IsPlayerCloseForAttack(skeleton, player, cameraY, cameraX)) {
-                        skeleton.prepareAttack(player,cameraX,cameraY);
+        if (mapManager.getCurrentMap().getSkeletonArrayList() != null)
+            for (Skeleton skeleton : mapManager.getCurrentMap().getSkeletonArrayList())
+                if (skeleton.isActive()) {
+                    skeleton.update(delta, mapManager.getCurrentMap());
+                    if (skeleton.isAttacking()) {
+                        if (!skeleton.isAttackChecked()) {
+                            checkEnemyAttack(skeleton);
+                        }
+                    } else if (!skeleton.isPreparingAttack()) {
+                        if (HelpMethods.IsPlayerCloseForAttack(skeleton, player, cameraY, cameraX)) {
+                            skeleton.prepareAttack(player, cameraX, cameraY);
+                        }
                     }
                 }
-            }
 
 
         sortArray();
@@ -149,9 +149,11 @@ public class Playing extends BaseState implements GameStateInterface {
         attackBoxWithoutCamera.right -= cameraX;
         attackBoxWithoutCamera.bottom -= cameraY;
 
-        for (Skeleton s : mapManager.getCurrentMap().getSkeletonArrayList())
-            if (attackBoxWithoutCamera.intersects(s.getHitbox().left, s.getHitbox().top, s.getHitbox().right, s.getHitbox().bottom))
-                s.setActive(false);
+
+        if (mapManager.getCurrentMap().getSkeletonArrayList() != null)
+            for (Skeleton s : mapManager.getCurrentMap().getSkeletonArrayList())
+                if (attackBoxWithoutCamera.intersects(s.getHitbox().left, s.getHitbox().top, s.getHitbox().right, s.getHitbox().bottom))
+                    s.setActive(false);
 
         player.setAttackChecked(true);
     }

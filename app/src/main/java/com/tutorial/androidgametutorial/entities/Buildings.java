@@ -5,17 +5,17 @@ import static com.tutorial.androidgametutorial.helpers.GameConstants.Sprite.SCAL
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.PointF;
-import android.graphics.RectF;
 
 import com.tutorial.androidgametutorial.R;
-import com.tutorial.androidgametutorial.helpers.GameConstants;
 import com.tutorial.androidgametutorial.helpers.interfaces.BitmapMethods;
 import com.tutorial.androidgametutorial.main.MainActivity;
 
 public enum Buildings implements BitmapMethods {
 
 
-    HOUSE_ONE(0, 0, 64, 48, 23, 38, 20, 52);
+    HOUSE_ONE(0, 0, 64, 48, 23, 42, 12, 36),
+    HOUSE_TWO(64, 4, 62, 44, 23, 36, 11, 31),
+    HOUSE_SIX(304, 0, 64, 48, 39, 40, 18, 35);
 
 
     Bitmap houseImg;
@@ -26,9 +26,9 @@ public enum Buildings implements BitmapMethods {
     Buildings(int x, int y, int width, int height, int doorwayX, int doorwayY, int hitboxRoof, int hitboxFloor) {
         options.inScaled = false;
 
-        this.hitboxRoof = hitboxRoof;
-        this.hitboxFloor = hitboxFloor;
-        this.hitboxHeight = (hitboxFloor - hitboxRoof) * SCALE_MULTIPLIER;
+        this.hitboxRoof = hitboxRoof * SCALE_MULTIPLIER;
+        this.hitboxFloor = hitboxFloor * SCALE_MULTIPLIER;
+        this.hitboxHeight = this.hitboxFloor - this.hitboxRoof;
         this.hitboxWidth = width * SCALE_MULTIPLIER;
 
         Bitmap atlas = BitmapFactory.decodeResource(MainActivity.getGameContext().getResources(), R.drawable.buildings_atlas, options);
