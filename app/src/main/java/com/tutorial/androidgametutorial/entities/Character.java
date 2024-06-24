@@ -15,12 +15,21 @@ public abstract class Character extends Entity {
     protected final GameCharacters gameCharType;
     protected boolean attacking, attackChecked;
     private RectF attackBox = null;
+    private int attackDamage;
 
     public Character(PointF pos, GameCharacters gameCharType) {
         super(pos, HITBOX_SIZE, HITBOX_SIZE);
         this.gameCharType = gameCharType;
-
+        attackDamage = setAttackDamage();
         updateWepHitbox();
+
+    }
+
+    private int setAttackDamage() {
+        return switch (gameCharType) {
+            case PLAYER -> 50;
+            case SKELETON -> 25;
+        };
     }
 
     protected void updateAnimation() {
@@ -159,4 +168,7 @@ public abstract class Character extends Entity {
         this.attackChecked = attackChecked;
     }
 
+    public int getDamage() {
+        return attackDamage;
+    }
 }

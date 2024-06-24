@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 
+import com.tutorial.androidgametutorial.gamestates.DeathScreen;
 import com.tutorial.androidgametutorial.gamestates.Menu;
 import com.tutorial.androidgametutorial.gamestates.Playing;
 
@@ -13,8 +14,9 @@ public class Game {
     private SurfaceHolder holder;
     private Menu menu;
     private Playing playing;
+    private DeathScreen deathScreen;
     private GameLoop gameLoop;
-    private GameState currentGameState = GameState.MENU;
+    private GameState currentGameState = GameState.DEATH_SCREEN;
 
     public Game(SurfaceHolder holder) {
         this.holder = holder;
@@ -23,10 +25,10 @@ public class Game {
     }
 
     public void update(double delta) {
-
         switch (currentGameState) {
             case MENU -> menu.update(delta);
             case PLAYING -> playing.update(delta);
+            case DEATH_SCREEN -> deathScreen.update(delta);
         }
     }
 
@@ -38,6 +40,7 @@ public class Game {
         switch (currentGameState) {
             case MENU -> menu.render(c);
             case PLAYING -> playing.render(c);
+            case DEATH_SCREEN -> deathScreen.render(c);
         }
 
         holder.unlockCanvasAndPost(c);
@@ -46,12 +49,14 @@ public class Game {
     private void initGameStates() {
         menu = new Menu(this);
         playing = new Playing(this);
+        deathScreen = new DeathScreen(this);
     }
 
     public boolean touchEvent(MotionEvent event) {
         switch (currentGameState) {
             case MENU -> menu.touchEvents(event);
             case PLAYING -> playing.touchEvents(event);
+            case DEATH_SCREEN -> deathScreen.touchEvents(event);
         }
 
         return true;
@@ -62,7 +67,7 @@ public class Game {
     }
 
     public enum GameState {
-        MENU, PLAYING;
+        MENU, PLAYING, DEATH_SCREEN;
     }
 
     public GameState getCurrentGameState() {
@@ -71,5 +76,17 @@ public class Game {
 
     public void setCurrentGameState(GameState currentGameState) {
         this.currentGameState = currentGameState;
+    }
+
+    public Menu getMenu() {
+        return menu;
+    }
+
+    public Playing getPlaying() {
+        return playing;
+    }
+
+    public DeathScreen getDeathScreen() {
+        return deathScreen;
     }
 }

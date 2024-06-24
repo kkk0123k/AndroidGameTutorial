@@ -64,7 +64,5 @@ public class Menu extends BaseState implements GameStateInterface {
 
     }
 
-    private boolean isIn(MotionEvent e, CustomButton b) {
-        return b.getHitbox().contains(e.getX(), e.getY());
-    }
+
 }

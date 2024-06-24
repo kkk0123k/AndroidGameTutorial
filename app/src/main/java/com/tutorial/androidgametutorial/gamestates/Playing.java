@@ -135,6 +135,7 @@ public class Playing extends BaseState implements GameStateInterface {
         playerHitbox.bottom -= cameraY;
         if (RectF.intersects(character.getAttackBox(), playerHitbox)) {
             System.out.println("Enemy Hit Player!");
+            playingUI.damagePlayer(character.getDamage());
         } else {
             System.out.println("Enemy Missed Player!");
         }
@@ -274,5 +275,9 @@ public class Playing extends BaseState implements GameStateInterface {
 
     public Player getPlayer() {
         return player;
+    }
+
+    public PlayingUI getPlayingUI() {
+        return playingUI;
     }
 }

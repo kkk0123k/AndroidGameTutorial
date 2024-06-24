@@ -11,7 +11,9 @@ import com.tutorial.androidgametutorial.main.MainActivity;
 public enum GameImages implements BitmapMethods {
 
 
-    MAINMENU_MENUBG(R.drawable.mainmenu_menubackground);
+    MAINMENU_MENUBG(R.drawable.mainmenu_menubackground),
+    DEATH_MENU_MENUBG(R.drawable.menu_youdied_background);
+
     private final Bitmap image;
 
     GameImages(int resID) {
