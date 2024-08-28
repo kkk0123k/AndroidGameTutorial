@@ -10,6 +10,7 @@ public class Player extends Character {
 
     public Player() {
         super(new PointF(GAME_WIDTH / 2, GAME_HEIGHT / 2), GameCharacters.PLAYER);
+        setStartHealth(600);
     }
 
     public void update(double delta, boolean movePlayer) {

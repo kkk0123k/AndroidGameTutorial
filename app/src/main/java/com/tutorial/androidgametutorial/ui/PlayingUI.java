@@ -7,6 +7,7 @@ import android.graphics.PointF;
 import android.view.MotionEvent;
 
 import com.tutorial.androidgametutorial.entities.Character;
+import com.tutorial.androidgametutorial.entities.Player;
 import com.tutorial.androidgametutorial.gamestates.Playing;
 import com.tutorial.androidgametutorial.main.Game;
 
@@ -29,8 +30,8 @@ public class PlayingUI {
 
     // Health
     private final int healthIconX = 150, healthIconY = 25;
-    private int maxPlayerHealth = 600;
-    private int currentPlayerHealth = 275;
+//    private int maxPlayerHealth = 600;
+//    private int currentPlayerHealth = 275;
 
     public PlayingUI(Playing playing) {
         this.playing = playing;
@@ -63,9 +64,10 @@ public class PlayingUI {
     }
 
     private void drawHealth(Canvas c) {
-        for (int i = 0; i < maxPlayerHealth / 100; i++) {
+        Player player = playing.getPlayer();
+        for (int i = 0; i < player.getMaxHealth() / 100; i++) {
             int x = healthIconX + 100 * i;
-            int heartValue = currentPlayerHealth - 100 * i;
+            int heartValue = player.getCurrentHealth() - 100 * i;
 
             if (heartValue < 100) {
                 if (heartValue <= 0)
@@ -83,13 +85,7 @@ public class PlayingUI {
 
     }
 
-    public void damagePlayer(int damage) {
-        this.currentPlayerHealth -= damage;
-        if (currentPlayerHealth <= 0) {
-            playing.getGame().setCurrentGameState(Game.GameState.DEATH_SCREEN);
-            resetPlayerHealth();
-        }
-    }
+
 
     private boolean isInsideRadius(PointF eventPos, PointF circle) {
         float a = Math.abs(eventPos.x - circle.x);
@@ -174,7 +170,7 @@ public class PlayingUI {
         return b.getHitbox().contains(eventPos.x, eventPos.y);
     }
 
-    public void resetPlayerHealth() {
-        this.currentPlayerHealth = maxPlayerHealth;
-    }
+//    public void resetPlayerHealth() {
+//        this.currentPlayerHealth = maxPlayerHealth;
+//    }
 }

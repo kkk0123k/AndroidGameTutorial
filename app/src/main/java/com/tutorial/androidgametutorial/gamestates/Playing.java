@@ -36,7 +36,7 @@ public class Playing extends BaseState implements GameStateInterface {
     private MapManager mapManager;
     private Player player;
     private PlayingUI playingUI;
-    private final Paint redPaint;
+    private final Paint redPaint, healthBarRed, healthBarBlack;
 
     private boolean doorwayJustPassed;
     private Entity[] listOfDrawables;
@@ -56,6 +56,20 @@ public class Playing extends BaseState implements GameStateInterface {
         redPaint.setStrokeWidth(1);
         redPaint.setStyle(Paint.Style.STROKE);
         redPaint.setColor(Color.RED);
+
+        healthBarRed = new Paint();
+        healthBarBlack = new Paint();
+        initHealthBars();
+    }
+
+    private void initHealthBars() {
+        healthBarRed.setStrokeWidth(10);
+        healthBarRed.setStyle(Paint.Style.STROKE);
+        healthBarRed.setColor(Color.RED);
+        healthBarBlack.setStrokeWidth(14);
+        healthBarBlack.setStyle(Paint.Style.STROKE);
+        healthBarBlack.setColor(Color.BLACK);
+
     }
 
     private void calcStartCameraValues() {
@@ -135,11 +149,21 @@ public class Playing extends BaseState implements GameStateInterface {
         playerHitbox.bottom -= cameraY;
         if (RectF.intersects(character.getAttackBox(), playerHitbox)) {
             System.out.println("Enemy Hit Player!");
-            playingUI.damagePlayer(character.getDamage());
+            player.damageCharacter(character.getDamage());
+            checkPlayerDead();
         } else {
             System.out.println("Enemy Missed Player!");
         }
         character.setAttackChecked(true);
+    }
+
+    private void checkPlayerDead() {
+        if (player.getCurrentHealth() > 0)
+            return;
+
+        game.setCurrentGameState(Game.GameState.DEATH_SCREEN);
+        player.resetCharacterHealth();
+
     }
 
     private void checkPlayerAttack() {
@@ -150,11 +174,18 @@ public class Playing extends BaseState implements GameStateInterface {
         attackBoxWithoutCamera.right -= cameraX;
         attackBoxWithoutCamera.bottom -= cameraY;
 
-
         if (mapManager.getCurrentMap().getSkeletonArrayList() != null)
             for (Skeleton s : mapManager.getCurrentMap().getSkeletonArrayList())
-                if (attackBoxWithoutCamera.intersects(s.getHitbox().left, s.getHitbox().top, s.getHitbox().right, s.getHitbox().bottom))
-                    s.setActive(false);
+                if (attackBoxWithoutCamera.intersects(s.getHitbox().left, s.getHitbox().top, s.getHitbox().right, s.getHitbox().bottom)) {
+                    s.damageCharacter(player.getDamage());
+
+                    if (s.getCurrentHealth() <= 0)
+                        s.setSkeletonInactive();
+
+
+//                    s.setActive(false);
+                }
+//
 
         player.setAttackChecked(true);
     }
@@ -213,6 +244,29 @@ public class Playing extends BaseState implements GameStateInterface {
 //        canvas.drawRect(c.getHitbox().left + cameraX, c.getHitbox().top + cameraY, c.getHitbox().right + cameraX, c.getHitbox().bottom + cameraY, redPaint);
         if (c.isAttacking())
             drawEnemyWeapon(canvas, c);
+
+        if (c.getCurrentHealth() < c.getMaxHealth())
+            drawHealthBar(canvas, c);
+
+
+    }
+
+    private void drawHealthBar(Canvas canvas, Character c) {
+        canvas.drawLine(c.getHitbox().left + cameraX,
+                c.getHitbox().top + cameraY - 5 * GameConstants.Sprite.SCALE_MULTIPLIER,
+                c.getHitbox().right + cameraX,
+                c.getHitbox().top + cameraY - 5 * GameConstants.Sprite.SCALE_MULTIPLIER, healthBarBlack);
+
+        float fullBarWidth = c.getHitbox().width();
+        float percentOfMaxHealth = (float) c.getCurrentHealth() / c.getMaxHealth();
+        float barWidth = fullBarWidth * percentOfMaxHealth;
+        float xDelta = (fullBarWidth - barWidth) / 2.0f;
+
+
+        canvas.drawLine(c.getHitbox().left + cameraX + xDelta,
+                c.getHitbox().top + cameraY - 5 * GameConstants.Sprite.SCALE_MULTIPLIER,
+                c.getHitbox().left + cameraX + xDelta + barWidth,
+                c.getHitbox().top + cameraY - 5 * GameConstants.Sprite.SCALE_MULTIPLIER, healthBarRed);
     }
 
     private void updatePlayerMove(double delta) {

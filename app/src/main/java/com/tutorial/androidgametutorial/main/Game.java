@@ -16,7 +16,7 @@ public class Game {
     private Playing playing;
     private DeathScreen deathScreen;
     private GameLoop gameLoop;
-    private GameState currentGameState = GameState.DEATH_SCREEN;
+    private GameState currentGameState = GameState.MENU;
 
     public Game(SurfaceHolder holder) {
         this.holder = holder;

@@ -17,6 +17,9 @@ public abstract class Character extends Entity {
     private RectF attackBox = null;
     private int attackDamage;
 
+    private int maxHealth;
+    private int currentHealth;
+
     public Character(PointF pos, GameCharacters gameCharType) {
         super(pos, HITBOX_SIZE, HITBOX_SIZE);
         this.gameCharType = gameCharType;
@@ -25,9 +28,23 @@ public abstract class Character extends Entity {
 
     }
 
+    protected void setStartHealth(int health) {
+        maxHealth = health;
+        currentHealth = maxHealth;
+    }
+
+    public void resetCharacterHealth() {
+        currentHealth = maxHealth;
+    }
+
+    public void damageCharacter(int damage) {
+        this.currentHealth -= damage;
+    }
+
     private int setAttackDamage() {
         return switch (gameCharType) {
-            case PLAYER -> 50;
+            case PLAYER -> 10;
+//            case PLAYER -> 50;
             case SKELETON -> 25;
         };
     }
@@ -171,4 +188,13 @@ public abstract class Character extends Entity {
     public int getDamage() {
         return attackDamage;
     }
+
+    public int getMaxHealth() {
+        return maxHealth;
+    }
+
+    public int getCurrentHealth() {
+        return currentHealth;
+    }
 }
+

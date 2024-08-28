@@ -25,6 +25,7 @@ public class Skeleton extends Character {
 
     public Skeleton(PointF pos) {
         super(pos, GameCharacters.SKELETON);
+        setStartHealth(100);
     }
 
     public void update(double delta, GameMap gameMap) {
@@ -123,5 +124,9 @@ public class Skeleton extends Character {
 
     public boolean isPreparingAttack() {
         return preparingAttack;
+    }
+
+    public void setSkeletonInactive() {
+        active = false;
     }
 }
