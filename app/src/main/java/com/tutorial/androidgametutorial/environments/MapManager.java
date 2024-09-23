@@ -21,17 +21,34 @@ public class MapManager {
     private float cameraX, cameraY;
     private Playing playing;
 
+    /**
+     * Constructs a MapManager to manage the game's maps and camera.
+     *
+     * @param playing The Playing state of the game.
+     */
     public MapManager(Playing playing) {
         this.playing = playing;
         initTestMap();
-
     }
 
+    /**
+     * Sets the camera's position in the game world.
+     *
+     * @param cameraX The X coordinate of the camera.
+     * @param cameraY The Y coordinate of the camera.
+     */
     public void setCameraValues(float cameraX, float cameraY) {
         this.cameraX = cameraX;
         this.cameraY = cameraY;
     }
 
+    /**
+     * Checks if the specified coordinates are within the bounds of the current map.
+     *
+     * @param x The X coordinate to check.
+     * @param y The Y coordinate to check.
+     * @return True if movement is possible, otherwise false.
+     */
     public boolean canMoveHere(float x, float y) {
         if (x < 0 || y < 0)
             return false;
@@ -42,30 +59,61 @@ public class MapManager {
         return true;
     }
 
+    /**
+     * Retrieves the maximum width of the current map based on its sprite array dimensions.
+     *
+     * @return The maximum width of the current map.
+     */
     public int getMaxWidthCurrentMap() {
         return currentMap.getArrayWidth() * GameConstants.Sprite.SIZE;
     }
 
+    /**
+     * Retrieves the maximum height of the current map based on its sprite array dimensions.
+     *
+     * @return The maximum height of the current map.
+     */
     public int getMaxHeightCurrentMap() {
         return currentMap.getArrayHeight() * GameConstants.Sprite.SIZE;
     }
 
-
+    /**
+     * Draws a game object on the specified canvas.
+     *
+     * @param c The Canvas on which to draw the object.
+     * @param go The GameObject to be drawn.
+     */
     public void drawObject(Canvas c, GameObject go) {
         c.drawBitmap(go.getObjectType().getObjectImg(), go.getHitbox().left + cameraX, go.getHitbox().top - go.getObjectType().getHitboxRoof() + cameraY, null);
     }
 
+    /**
+     * Draws a building on the specified canvas.
+     *
+     * @param c The Canvas on which to draw the building.
+     * @param b The Building to be drawn.
+     */
     public void drawBuilding(Canvas c, Building b) {
         c.drawBitmap(b.getBuildingType().getHouseImg(), b.getPos().x + cameraX, b.getPos().y - b.getBuildingType().getHitboxRoof() + cameraY, null);
     }
 
+    /**
+     * Draws the floor tiles of the current map on the specified canvas.
+     *
+     * @param c The Canvas on which to draw the tiles.
+     */
     public void drawTiles(Canvas c) {
         for (int j = 0; j < currentMap.getArrayHeight(); j++)
             for (int i = 0; i < currentMap.getArrayWidth(); i++)
                 c.drawBitmap(currentMap.getFloorType().getSprite(currentMap.getSpriteID(i, j)), i * GameConstants.Sprite.SIZE + cameraX, j * GameConstants.Sprite.SIZE + cameraY, null);
     }
 
-
+    /**
+     * Checks if the player is currently inside a doorway.
+     *
+     * @param playerHitbox The hitbox of the player.
+     * @return The Doorway if the player is inside, otherwise null.
+     */
     public Doorway isPlayerOnDoorway(RectF playerHitbox) {
         for (Doorway doorway : currentMap.getDoorwayArrayList())
             if (doorway.isPlayerInsideDoorway(playerHitbox, cameraX, cameraY))
@@ -74,6 +122,11 @@ public class MapManager {
         return null;
     }
 
+    /**
+     * Changes the current map to the one associated with the specified doorway.
+     *
+     * @param doorwayTarget The Doorway leading to the new map.
+     */
     public void changeMap(Doorway doorwayTarget) {
         this.currentMap = doorwayTarget.getGameMapLocatedIn();
 
@@ -87,10 +140,18 @@ public class MapManager {
         playing.setDoorwayJustPassed(true);
     }
 
+    /**
+     * Retrieves the current game map.
+     *
+     * @return The current GameMap object.
+     */
     public GameMap getCurrentMap() {
         return currentMap;
     }
 
+    /**
+     * Initializes a test map with predefined tile layouts and entities.
+     */
     private void initTestMap() {
 
         int[][] outsideArray = {
@@ -180,9 +241,6 @@ public class MapManager {
                 HelpMethods.CreatePointForDoorway(outsideMap, 2),
                 insideGreenRoofHouseMap,
                 HelpMethods.CreatePointForDoorway(3, 6));
-
-
-
 
         currentMap = outsideMap;
     }

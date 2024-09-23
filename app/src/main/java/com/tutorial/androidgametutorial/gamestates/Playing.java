@@ -30,6 +30,11 @@ import com.tutorial.androidgametutorial.ui.PlayingUI;
 import java.util.Arrays;
 
 public class Playing extends BaseState implements GameStateInterface {
+
+    /**
+     * Represents the playing state of the game, where the main gameplay occurs.
+     */
+
     private float cameraX, cameraY;
     private boolean movePlayer;
     private PointF lastTouchDiff;
@@ -42,6 +47,11 @@ public class Playing extends BaseState implements GameStateInterface {
     private Entity[] listOfDrawables;
     private boolean listOfEntitiesMade;
 
+    /**
+     * Initializes the Playing state with the game instance.
+     *
+     * @param game The game instance being played.
+     */
     public Playing(Game game) {
         super(game);
 
@@ -62,6 +72,9 @@ public class Playing extends BaseState implements GameStateInterface {
         initHealthBars();
     }
 
+    /**
+     * Initializes health bar paints for visual representation.
+     */
     private void initHealthBars() {
         healthBarRed.setStrokeWidth(10);
         healthBarRed.setStyle(Paint.Style.STROKE);
@@ -72,12 +85,19 @@ public class Playing extends BaseState implements GameStateInterface {
 
     }
 
+    /**
+     * Calculates initial camera values based on the game map size.
+     */
     private void calcStartCameraValues() {
         cameraX = GAME_WIDTH / 2f - mapManager.getMaxWidthCurrentMap() / 2f;
         cameraY = GAME_HEIGHT / 2f - mapManager.getMaxHeightCurrentMap() / 2f;
     }
 
-
+    /**
+     * Updates the game state.
+     *
+     * @param delta The time difference since the last update.
+     */
     @Override
     public void update(double delta) {
         buildEntityList();
@@ -109,23 +129,36 @@ public class Playing extends BaseState implements GameStateInterface {
 
     }
 
-
+    /**
+     * Builds a list of drawable entities for the current map.
+     */
     private void buildEntityList() {
         listOfDrawables = mapManager.getCurrentMap().getDrawableList();
         listOfDrawables[listOfDrawables.length - 1] = player;
         listOfEntitiesMade = true;
     }
 
+    /**
+     * Sorts the drawable entities based on their Y-coordinate.
+     */
     private void sortArray() {
         player.setLastCameraYValue(cameraY);
         Arrays.sort(listOfDrawables);
     }
 
+    /**
+     * Sets the camera values based on the provided position.
+     *
+     * @param cameraPos The new camera position.
+     */
     public void setCameraValues(PointF cameraPos) {
         this.cameraX = cameraPos.x;
         this.cameraY = cameraPos.y;
     }
 
+    /**
+     * Checks if the player is on a doorway and changes maps if necessary.
+     */
     private void checkForDoorway() {
         Doorway doorwayPlayerIsOn = mapManager.isPlayerOnDoorway(player.getHitbox());
 
@@ -135,11 +168,20 @@ public class Playing extends BaseState implements GameStateInterface {
 
     }
 
+    /**
+     * Sets the flag indicating if a doorway was just passed.
+     *
+     * @param doorwayJustPassed Indicates if a doorway was just passed.
+     */
     public void setDoorwayJustPassed(boolean doorwayJustPassed) {
         this.doorwayJustPassed = doorwayJustPassed;
     }
 
-
+    /**
+     * Checks if the enemy character is attacking the player.
+     *
+     * @param character The enemy character checking for an attack.
+     */
     private void checkEnemyAttack(Character character) {
         character.updateWepHitbox();
         RectF playerHitbox = new RectF(player.getHitbox());
@@ -157,6 +199,9 @@ public class Playing extends BaseState implements GameStateInterface {
         character.setAttackChecked(true);
     }
 
+    /**
+     * Checks if the player is dead and transitions to the death screen if necessary.
+     */
     private void checkPlayerDead() {
         if (player.getCurrentHealth() > 0)
             return;
@@ -166,6 +211,9 @@ public class Playing extends BaseState implements GameStateInterface {
 
     }
 
+    /**
+     * Checks if the player is attacking and processes damage to enemies.
+     */
     private void checkPlayerAttack() {
 
         RectF attackBoxWithoutCamera = new RectF(player.getAttackBox());
@@ -190,7 +238,11 @@ public class Playing extends BaseState implements GameStateInterface {
         player.setAttackChecked(true);
     }
 
-
+    /**
+     * Renders the game state on the canvas.
+     *
+     * @param c The canvas on which to draw the game state.
+     */
     @Override
     public void render(Canvas c) {
         mapManager.drawTiles(c);
@@ -200,6 +252,11 @@ public class Playing extends BaseState implements GameStateInterface {
         playingUI.draw(c);
     }
 
+    /**
+     * Draws the sorted entities on the canvas.
+     *
+     * @param c The canvas for rendering entities.
+     */
     private void drawSortedEntities(Canvas c) {
         for (Entity e : listOfDrawables) {
             if (e instanceof Skeleton skeleton) {
@@ -214,7 +271,11 @@ public class Playing extends BaseState implements GameStateInterface {
         }
     }
 
-
+    /**
+     * Draws the player character on the canvas.
+     *
+     * @param c The canvas for rendering the player character.
+     */
     private void drawPlayer(Canvas c) {
         c.drawBitmap(Weapons.SHADOW.getWeaponImg(), player.getHitbox().left, player.getHitbox().bottom - 5 * GameConstants.Sprite.SCALE_MULTIPLIER, null);
         c.drawBitmap(player.getGameCharType().getSprite(player.getAniIndex(), player.getFaceDir()), player.getHitbox().left - X_DRAW_OFFSET, player.getHitbox().top - GameConstants.Sprite.Y_DRAW_OFFSET, null);
@@ -222,7 +283,12 @@ public class Playing extends BaseState implements GameStateInterface {
         if (player.isAttacking()) drawWeapon(c, player);
     }
 
-
+    /**
+     * Draws the weapon of the specified character.
+     *
+     * @param c        The canvas for rendering the weapon.
+     * @param character The character whose weapon is being drawn.
+     */
     private void drawWeapon(Canvas c, Character character) {
         c.rotate(character.getWepRot(), character.getAttackBox().left, character.getAttackBox().top);
         c.drawBitmap(Weapons.BIG_SWORD.getWeaponImg(), character.getAttackBox().left + character.wepRotAdjustLeft(), character.getAttackBox().top + character.wepRotAdjustTop(), null);
@@ -230,6 +296,13 @@ public class Playing extends BaseState implements GameStateInterface {
         c.drawRect(character.getAttackBox(), redPaint);
     }
 
+
+    /**
+     * Draws the weapon of the specified enemy character.
+     *
+     * @param c        The canvas for rendering the enemy weapon.
+     * @param character The character whose weapon is being drawn.
+     */
     private void drawEnemyWeapon(Canvas c, Character character) {
         c.rotate(character.getWepRot(), character.getAttackBox().left + cameraX, character.getAttackBox().top + cameraY);
         c.drawBitmap(Weapons.BIG_SWORD.getWeaponImg(), character.getAttackBox().left + cameraX + character.wepRotAdjustLeft(), character.getAttackBox().top + cameraY + character.wepRotAdjustTop(), null);
@@ -237,7 +310,12 @@ public class Playing extends BaseState implements GameStateInterface {
 //        c.drawRect(character.getAttackBox(), redPaint);
     }
 
-
+    /**
+     * Draws the specified character on the canvas.
+     *
+     * @param canvas The canvas for rendering the character.
+     * @param c      The character to be drawn.
+     */
     public void drawCharacter(Canvas canvas, Character c) {
         canvas.drawBitmap(Weapons.SHADOW.getWeaponImg(), c.getHitbox().left + cameraX, c.getHitbox().bottom - 5 * GameConstants.Sprite.SCALE_MULTIPLIER + cameraY, null);
         canvas.drawBitmap(c.getGameCharType().getSprite(c.getAniIndex(), c.getFaceDir()), c.getHitbox().left + cameraX - X_DRAW_OFFSET, c.getHitbox().top + cameraY - GameConstants.Sprite.Y_DRAW_OFFSET, null);
@@ -247,10 +325,14 @@ public class Playing extends BaseState implements GameStateInterface {
 
         if (c.getCurrentHealth() < c.getMaxHealth())
             drawHealthBar(canvas, c);
-
-
     }
 
+    /**
+     * Draws the health bar for the specified character.
+     *
+     * @param canvas The canvas for rendering the health bar.
+     * @param c      The character whose health bar is being drawn.
+     */
     private void drawHealthBar(Canvas canvas, Character c) {
         canvas.drawLine(c.getHitbox().left + cameraX,
                 c.getHitbox().top + cameraY - 5 * GameConstants.Sprite.SCALE_MULTIPLIER,
@@ -269,6 +351,11 @@ public class Playing extends BaseState implements GameStateInterface {
                 c.getHitbox().top + cameraY - 5 * GameConstants.Sprite.SCALE_MULTIPLIER, healthBarRed);
     }
 
+    /**
+     * Updates the player's movement based on input.
+     *
+     * @param delta The time difference since the last update.
+     */
     private void updatePlayerMove(double delta) {
         if (!movePlayer) return;
 
@@ -308,29 +395,55 @@ public class Playing extends BaseState implements GameStateInterface {
         }
     }
 
+    /**
+     * Transitions the game state to the menu.
+     */
     public void setGameStateToMenu() {
         game.setCurrentGameState(Game.GameState.MENU);
     }
 
+    /**
+     * Sets the player's movement to true and records the touch difference.
+     *
+     * @param lastTouchDiff The difference in touch movement.
+     */
     public void setPlayerMoveTrue(PointF lastTouchDiff) {
         movePlayer = true;
         this.lastTouchDiff = lastTouchDiff;
     }
 
+    /**
+     * Stops player movement and resets animation.
+     */
     public void setPlayerMoveFalse() {
         movePlayer = false;
         player.resetAnimation();
     }
 
+    /**
+     * Processes touch events in the game.
+     *
+     * @param event The touch event occurring in the game.
+     */
     @Override
     public void touchEvents(MotionEvent event) {
         playingUI.touchEvents(event);
     }
 
+    /**
+     * Returns the player instance.
+     *
+     * @return The player instance.
+     */
     public Player getPlayer() {
         return player;
     }
 
+    /**
+     * Returns the UI associated with the playing state.
+     *
+     * @return The playing UI instance.
+     */
     public PlayingUI getPlayingUI() {
         return playingUI;
     }

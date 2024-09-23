@@ -22,12 +22,22 @@ public class Skeleton extends Character {
     private long timerBeforeAttack, timerAttackDuration;
     private long timeToAttack = 500, timeForAttackDuration = 250;
 
-
+    /**
+     * Constructs a Skeleton entity with a specified position.
+     *
+     * @param pos The position of the skeleton in the game world.
+     */
     public Skeleton(PointF pos) {
         super(pos, GameCharacters.SKELETON);
         setStartHealth(100);
     }
 
+    /**
+     * Updates the skeleton's state, including movement and attack preparation.
+     *
+     * @param delta The time delta for frame updates.
+     * @param gameMap The current game map.
+     */
     public void update(double delta, GameMap gameMap) {
         if (moving) {
             updateMove(delta, gameMap);
@@ -41,6 +51,13 @@ public class Skeleton extends Character {
         }
     }
 
+    /**
+     * Prepares the skeleton to attack the player.
+     *
+     * @param player The player object.
+     * @param cameraX The camera's X position.
+     * @param cameraY The camera's Y position.
+     */
     public void prepareAttack(Player player, float cameraX, float cameraY) {
         timerBeforeAttack = System.currentTimeMillis();
         preparingAttack = true;
@@ -48,6 +65,13 @@ public class Skeleton extends Character {
         turnTowardsPlayer(player, cameraX, cameraY);
     }
 
+    /**
+     * Adjusts the skeleton's facing direction towards the player.
+     *
+     * @param player The player object.
+     * @param cameraX The camera's X position.
+     * @param cameraY The camera's Y position.
+     */
     private void turnTowardsPlayer(Player player, float cameraX, float cameraY) {
         float xDelta = hitbox.left - (player.getHitbox().left - cameraX);
         float yDelta = hitbox.top - (player.getHitbox().top - cameraY);
@@ -63,6 +87,10 @@ public class Skeleton extends Character {
         }
     }
 
+
+    /**
+     * Updates the attack timer to manage attack duration.
+     */
     private void updateAttackTimer() {
         if (timerAttackDuration + timeForAttackDuration < System.currentTimeMillis()) {
             setAttacking(false);
@@ -71,6 +99,9 @@ public class Skeleton extends Character {
         }
     }
 
+    /**
+     * Checks if the skeleton can initiate an attack based on the timer.
+     */
     private void checkTimeToAttackTimer() {
         if (timerBeforeAttack + timeToAttack < System.currentTimeMillis()) {
             setAttacking(true);
@@ -79,6 +110,12 @@ public class Skeleton extends Character {
         }
     }
 
+    /**
+     * Updates the skeleton's movement based on its current direction and map.
+     *
+     * @param delta The time delta for frame updates.
+     * @param gameMap The current game map.
+     */
     private void updateMove(double delta, GameMap gameMap) {
         if (System.currentTimeMillis() - lastDirChange >= 3000) {
             faceDir = rand.nextInt(4);
@@ -122,10 +159,18 @@ public class Skeleton extends Character {
         }
     }
 
+    /**
+     * Checks if the skeleton is currently preparing an attack.
+     *
+     * @return True if preparing to attack, false otherwise.
+     */
     public boolean isPreparingAttack() {
         return preparingAttack;
     }
 
+    /**
+     * Deactivates the skeleton, making it inactive in the game.
+     */
     public void setSkeletonInactive() {
         active = false;
     }

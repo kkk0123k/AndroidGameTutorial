@@ -20,6 +20,12 @@ public abstract class Character extends Entity {
     private int maxHealth;
     private int currentHealth;
 
+    /**
+     * Constructs a Character entity with a specified position and character type.
+     *
+     * @param pos The position of the character in the game world.
+     * @param gameCharType The type of game character (e.g., skeleton, player).
+     */
     public Character(PointF pos, GameCharacters gameCharType) {
         super(pos, HITBOX_SIZE, HITBOX_SIZE);
         this.gameCharType = gameCharType;
@@ -28,19 +34,37 @@ public abstract class Character extends Entity {
 
     }
 
+    /**
+     * Sets the starting health for the character.
+     *
+     * @param health The initial health to be set for the character.
+     */
     protected void setStartHealth(int health) {
         maxHealth = health;
         currentHealth = maxHealth;
     }
 
+    /**
+     * Resets the character's health to its maximum value.
+     */
     public void resetCharacterHealth() {
         currentHealth = maxHealth;
     }
 
+    /**
+     * Damages the character by reducing its current health.
+     *
+     * @param damage The amount of damage to apply to the character's health.
+     */
     public void damageCharacter(int damage) {
         this.currentHealth -= damage;
     }
 
+    /**
+     * Sets the attack damage based on the character type.
+     *
+     * @return The calculated attack damage value for the character.
+     */
     private int setAttackDamage() {
         return switch (gameCharType) {
             case PLAYER -> 10;
@@ -49,6 +73,9 @@ public abstract class Character extends Entity {
         };
     }
 
+    /**
+     * Updates the character's animation frame based on the animation speed.
+     */
     protected void updateAnimation() {
         aniTick++;
         if (aniTick >= GameConstants.Animation.SPEED) {
@@ -59,28 +86,56 @@ public abstract class Character extends Entity {
         }
     }
 
+    /**
+     * Resets the animation to the initial state.
+     */
     public void resetAnimation() {
         aniTick = 0;
         aniIndex = 0;
     }
 
+    /**
+     * Returns the current animation index, adjusted for attacking state.
+     *
+     * @return The current animation index for the character.
+     */
     public int getAniIndex() {
         if (attacking) return 4;
         return aniIndex;
     }
 
+    /**
+     * Returns the current facing direction of the character.
+     *
+     * @return The facing direction of the character as an integer.
+     */
     public int getFaceDir() {
         return faceDir;
     }
 
+    /**
+     * Sets the facing direction of the character.
+     *
+     * @param faceDir The new facing direction to be assigned to the character.
+     */
     public void setFaceDir(int faceDir) {
         this.faceDir = faceDir;
     }
 
+
+    /**
+     * Returns the type of game character.
+     *
+     * @return The character type as a GameCharacters enum.
+     */
     public GameCharacters getGameCharType() {
         return gameCharType;
     }
 
+
+    /**
+     * Updates the weapon hitbox based on the character's position and direction.
+     */
     public void updateWepHitbox() {
         PointF pos = getWepPos();
         float w = getWepWidth();
@@ -89,6 +144,11 @@ public abstract class Character extends Entity {
         attackBox = new RectF(pos.x, pos.y, pos.x + w, pos.y + h);
     }
 
+    /**
+     * Calculates the width of the weapon based on the character's facing direction.
+     *
+     * @return The calculated width of the weapon.
+     */
     public float getWepWidth() {
         //Must keep in mind, there is a rotation active
         return switch (getFaceDir()) {
@@ -103,6 +163,11 @@ public abstract class Character extends Entity {
         };
     }
 
+    /**
+     * Calculates the height of the weapon based on the character's facing direction.
+     *
+     * @return The calculated height of the weapon.
+     */
     public float getWepHeight() {
         //Must keep in mind, there is a rotation active
         return switch (getFaceDir()) {
@@ -117,6 +182,11 @@ public abstract class Character extends Entity {
         };
     }
 
+    /**
+     * Calculates the position of the weapon based on the character's facing direction.
+     *
+     * @return The calculated weapon position as a PointF object.
+     */
     public PointF getWepPos() {
         //Must keep in mind, there is a rotation active
         return switch (getFaceDir()) {
@@ -138,6 +208,11 @@ public abstract class Character extends Entity {
 
     }
 
+    /**
+     * Adjusts the top position of the weapon for rotation based on facing direction.
+     *
+     * @return The adjustment value for the top position of the weapon.
+     */
     public float wepRotAdjustTop() {
         return switch (getFaceDir()) {
             case GameConstants.Face_Dir.LEFT, GameConstants.Face_Dir.UP ->
@@ -146,6 +221,11 @@ public abstract class Character extends Entity {
         };
     }
 
+    /**
+     * Adjusts the left position of the weapon for rotation based on facing direction.
+     *
+     * @return The adjustment value for the left position of the weapon.
+     */
     public float wepRotAdjustLeft() {
         return switch (getFaceDir()) {
             case GameConstants.Face_Dir.UP, GameConstants.Face_Dir.RIGHT ->
@@ -154,6 +234,11 @@ public abstract class Character extends Entity {
         };
     }
 
+    /**
+     * Returns the rotation angle of the weapon based on facing direction.
+     *
+     * @return The rotation angle of the weapon in degrees.
+     */
     public float getWepRot() {
         return switch (getFaceDir()) {
             case GameConstants.Face_Dir.LEFT -> 90;
@@ -164,35 +249,75 @@ public abstract class Character extends Entity {
 
     }
 
+    /**
+     * Returns the attack hitbox for collision detection.
+     *
+     * @return The attack box as a RectF object for collision detection.
+     */
     public RectF getAttackBox() {
         return attackBox;
     }
 
+    /**
+     * Sets the attacking state of the character.
+     *
+     * @param attacking The new attacking state to be assigned to the character.
+     */
     public void setAttacking(boolean attacking) {
         this.attacking = attacking;
         if (!attacking) attackChecked = false;
     }
 
+    /**
+     * Checks if the character is currently attacking.
+     *
+     * @return True if the character is attacking, false otherwise.
+     */
     public boolean isAttacking() {
         return attacking;
     }
 
+    /**
+     * Checks if the attack has been verified.
+     *
+     * @return True if the attack has been checked, false otherwise.
+     */
     public boolean isAttackChecked() {
         return attackChecked;
     }
 
+    /**
+     * Sets the attack checked state.
+     *
+     * @param attackChecked The new attack checked state to be assigned to the character.
+     */
     public void setAttackChecked(boolean attackChecked) {
         this.attackChecked = attackChecked;
     }
 
+    /**
+     * Returns the damage dealt by the character's attack.
+     *
+     * @return The attack damage value for the character.
+     */
     public int getDamage() {
         return attackDamage;
     }
 
+    /**
+     * Returns the maximum health of the character.
+     *
+     * @return The maximum health value for the character.
+     */
     public int getMaxHealth() {
         return maxHealth;
     }
 
+    /**
+     * Returns the current health of the character.
+     *
+     * @return The current health value for the character.
+     */
     public int getCurrentHealth() {
         return currentHealth;
     }

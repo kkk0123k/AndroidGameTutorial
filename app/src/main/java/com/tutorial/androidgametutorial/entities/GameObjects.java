@@ -53,6 +53,16 @@ public enum GameObjects implements BitmapMethods {
     int width, height;
     int hitboxRoof, hitboxFloor, hitboxHeight;
 
+    /**
+     * Constructs a GameObject with the specified parameters.
+     *
+     * @param x The x-coordinate of the object in the sprite sheet.
+     * @param y The y-coordinate of the object in the sprite sheet.
+     * @param width The width of the object image.
+     * @param height The height of the object image.
+     * @param hitboxRoof The position of the object's hitbox roof.
+     * @param hitboxFloor The position of the object's hitbox floor.
+     */
     GameObjects(int x, int y, int width, int height, int hitboxRoof, int hitboxFloor) {
         options.inScaled = false;
         this.width = width;
@@ -64,19 +74,38 @@ public enum GameObjects implements BitmapMethods {
         objectImg = getScaledBitmap(Bitmap.createBitmap(atlas, x, y, width, height));
 
     }
-
+    /**
+     * Retrieves the height of the object's hitbox.
+     *
+     * @return The hitbox height in scaled pixels.
+     */
     public int getHitboxHeight() {
         return hitboxHeight;
     }
 
+    /**
+     * Retrieves the width of the object's hitbox.
+     *
+     * @return The hitbox width in scaled pixels.
+     */
     public int getHitboxWidth() {
         return width * GameConstants.Sprite.SCALE_MULTIPLIER;
     }
 
+    /**
+     * Retrieves the image bitmap of the object.
+     *
+     * @return The bitmap image of the object.
+     */
     public Bitmap getObjectImg() {
         return objectImg;
     }
 
+    /**
+     * Retrieves the position of the object's hitbox roof.
+     *
+     * @return The hitbox roof position in scaled pixels.
+     */
     public int getHitboxRoof() {
         return hitboxRoof * GameConstants.Sprite.SCALE_MULTIPLIER;
     }
