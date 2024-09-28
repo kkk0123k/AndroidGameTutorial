@@ -17,11 +17,9 @@ public enum ButtonImages implements BitmapMethods {
     // Enum constants representing different button images with associated drawable resource IDs, widths, and heights.
 
     MENU_START(R.drawable.mainmenu_button_start, 300, 140),
-
+    MENU_CONTINUE(R.drawable.final_mainmenu_button_continue, 300, 140),
     PLAYING_MENU(R.drawable.playing_button_menu, 140, 140),
-
     MENU_MENU(R.drawable.mainmenu_button_menu, 300, 140),
-
     MENU_REPLAY(R.drawable.mainmenu_button_replay, 300, 140);
 
     // Private instance variables to hold width, height, and bitmap representations of the button states.

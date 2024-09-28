@@ -13,7 +13,7 @@ import com.tutorial.androidgametutorial.main.MainActivity;
 public enum Buildings implements BitmapMethods {
 
     // Enum constants representing different building types with their respective parameters.
-    HOUSE_ONE(0, 0, 64, 48, 23, 42, 12, 36),
+    HOUSE_ONE(0, 0, 63, 48, 23, 42, 12, 36),
     HOUSE_TWO(64, 4, 62, 44, 23, 36, 11, 31),
     HOUSE_SIX(304, 0, 64, 48, 39, 40, 18, 35);
 

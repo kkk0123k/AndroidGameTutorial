@@ -1,5 +1,6 @@
 package com.tutorial.androidgametutorial.gamestates;
 
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.view.MotionEvent;
 
@@ -16,13 +17,20 @@ import com.tutorial.androidgametutorial.ui.GameImages;
 public class Menu extends BaseState implements GameStateInterface {
 
     private CustomButton btnStart; // Button for starting the game
+    private CustomButton btnContinue;
+    private Bitmap background; // Variable to hold the background image
+    private Bitmap scaledBackground;
 
     private int menuX = MainActivity.GAME_WIDTH / 6; // X-coordinate for menu background
-    private int menuY = 200; // Y-coordinate for menu background
+    private int menuY = 380; // Y-coordinate for menu background
 
     // X and Y coordinates for the start button based on the menu background size
     private int btnStartX = menuX + GameImages.MAINMENU_MENUBG.getImage().getWidth() / 2 - ButtonImages.MENU_START.getWidth() / 2;
     private int btnStartY = menuY + 100; // Y-coordinate for the start button
+
+    // Position the continue button below the start button
+    private int btnContinueX = menuX + GameImages.MAINMENU_MENUBG.getImage().getWidth() / 2 - ButtonImages.MENU_CONTINUE.getWidth() / 2;
+    private int btnContinueY = btnStartY + ButtonImages.MENU_START.getHeight() + 40; // Y-coordinate for the continue button (20 pixels below the start button)
 
     /**
      * Constructs a Menu with the specified Game instance.
@@ -32,6 +40,9 @@ public class Menu extends BaseState implements GameStateInterface {
     public Menu(Game game) {
         super(game); // Calls the superclass constructor
         btnStart = new CustomButton(btnStartX, btnStartY, ButtonImages.MENU_START.getWidth(), ButtonImages.MENU_START.getHeight()); // Initializes the start button
+        btnContinue = new CustomButton(btnContinueX, btnContinueY, ButtonImages.MENU_START.getWidth(), ButtonImages.MENU_CONTINUE.getHeight()); // Initializes the start button
+        background = GameImages.MENU_BACKGROUND.getImage();
+        scaledBackground = Bitmap.createScaledBitmap(background, MainActivity.GAME_WIDTH, MainActivity.GAME_HEIGHT, true);
     }
 
     /**
@@ -51,7 +62,11 @@ public class Menu extends BaseState implements GameStateInterface {
      */
     @Override
     public void render(Canvas c) {
+
         // Draws the main menu background image
+        c.drawBitmap(scaledBackground, 0, 0, null);
+
+        // Draws the main menu frame to store the button in it
         c.drawBitmap(
                 GameImages.MAINMENU_MENUBG.getImage(),
                 menuX,
@@ -63,6 +78,13 @@ public class Menu extends BaseState implements GameStateInterface {
                 ButtonImages.MENU_START.getBtnImg(btnStart.isPushed()),
                 btnStart.getHitbox().left,
                 btnStart.getHitbox().top,
+                null);
+
+        // Draws the continue button image based on its pressed state
+        c.drawBitmap(
+                ButtonImages.MENU_CONTINUE.getBtnImg(btnContinue.isPushed()),
+                btnContinue.getHitbox().left,
+                btnContinue.getHitbox().top,
                 null);
     }
 

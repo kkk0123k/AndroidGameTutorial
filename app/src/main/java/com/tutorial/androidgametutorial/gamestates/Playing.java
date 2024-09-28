@@ -106,7 +106,6 @@ public class Playing extends BaseState implements GameStateInterface {
         mapManager.setCameraValues(cameraX, cameraY);
         checkForDoorway();
 
-
         if (player.isAttacking()) if (!player.isAttackChecked()) checkPlayerAttack();
 
         if (mapManager.getCurrentMap().getSkeletonArrayList() != null)
@@ -123,7 +122,6 @@ public class Playing extends BaseState implements GameStateInterface {
                         }
                     }
                 }
-
 
         sortArray();
 
@@ -207,6 +205,7 @@ public class Playing extends BaseState implements GameStateInterface {
             return;
 
         game.setCurrentGameState(Game.GameState.DEATH_SCREEN);
+
         player.resetCharacterHealth();
 
     }
@@ -227,16 +226,39 @@ public class Playing extends BaseState implements GameStateInterface {
                 if (attackBoxWithoutCamera.intersects(s.getHitbox().left, s.getHitbox().top, s.getHitbox().right, s.getHitbox().bottom)) {
                     s.damageCharacter(player.getDamage());
 
-                    if (s.getCurrentHealth() <= 0)
+                    if (s.getCurrentHealth() <= 0) {
                         s.setSkeletonInactive();
-
-
+                        checkActiveSkeletons();
+                    }
 //                    s.setActive(false);
                 }
 //
 
         player.setAttackChecked(true);
     }
+
+    /**
+     * Checks if there are any active skeletons remaining.
+     * If none remain, transitions to the death screen.
+     */
+    private void checkActiveSkeletons() {
+        boolean allSkeletonsInactive = true;
+
+        if (mapManager.getCurrentMap().getSkeletonArrayList() != null) {
+            for (Skeleton skeleton : mapManager.getCurrentMap().getSkeletonArrayList()) {
+                if (skeleton.isActive()) {
+                    allSkeletonsInactive = false;
+                    break; // Exit early if at least one skeleton is active.
+                }
+            }
+        }
+
+        if (allSkeletonsInactive) {
+            game.setCurrentGameState(Game.GameState.DEATH_SCREEN); // Transition to death screen
+            player.resetCharacterHealth();
+        }
+    }
+
 
     /**
      * Renders the game state on the canvas.

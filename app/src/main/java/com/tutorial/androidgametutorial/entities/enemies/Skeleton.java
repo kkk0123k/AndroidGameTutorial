@@ -174,4 +174,14 @@ public class Skeleton extends Character {
     public void setSkeletonInactive() {
         active = false;
     }
+
+    public void reactivate() {
+        active = true; // Reactivate the skeleton
+        setStartHealth(100); // Reset health or use a method to reset health
+        moving = true; // Reset movement state
+        preparingAttack = false; // Reset attack preparation
+        setAttacking(false); // Ensure it is not attacking
+        // Reset any other state variables as needed
+    }
+
 }
