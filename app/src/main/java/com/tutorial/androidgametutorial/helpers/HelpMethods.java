@@ -88,14 +88,12 @@ public class HelpMethods {
         ArrayList<Skeleton> skeletonArrayList = new ArrayList<>();
 
         for (int i = 0; i < amount; i++) {
-            float x = (float) (Math.random() * width);
-            float y = (float) (Math.random() * height);
+            float x = (float) (Math.random() * width - GameConstants.Sprite.SIZE);
+            float y = (float) (Math.random() * height - GameConstants.Sprite.SIZE);
             skeletonArrayList.add(new Skeleton(new PointF(x, y)));
         }
 
-
         return skeletonArrayList;
-
     }
 
     /**

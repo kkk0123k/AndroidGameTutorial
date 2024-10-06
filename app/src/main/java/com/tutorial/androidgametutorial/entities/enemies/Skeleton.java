@@ -11,7 +11,6 @@ import com.tutorial.androidgametutorial.entities.Player;
 import com.tutorial.androidgametutorial.environments.GameMap;
 import com.tutorial.androidgametutorial.helpers.GameConstants;
 import com.tutorial.androidgametutorial.helpers.HelpMethods;
-import com.tutorial.androidgametutorial.main.Game;
 
 import java.util.Random;
 

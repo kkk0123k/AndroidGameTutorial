@@ -14,7 +14,7 @@ public enum GameImages implements BitmapMethods {
 
     MAINMENU_MENUBG(R.drawable.mainmenu_menubackground),
     DEATH_MENU_MENUBG(R.drawable.menu_youdied_background),
-    MENU_BACKGROUND(R.drawable.background); // Add your GIF as a static resource
+    MENU_BACKGROUND(R.drawable.background);
 
     // Private variable to hold the loaded image as a Bitmap.
     private final Bitmap image;

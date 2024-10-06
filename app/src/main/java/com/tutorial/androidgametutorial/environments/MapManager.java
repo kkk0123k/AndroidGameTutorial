@@ -5,9 +5,7 @@ import android.graphics.PointF;
 import android.graphics.RectF;
 
 import com.tutorial.androidgametutorial.entities.Building;
-import com.tutorial.androidgametutorial.entities.Buildings;
 import com.tutorial.androidgametutorial.entities.GameObject;
-import com.tutorial.androidgametutorial.entities.GameObjects;
 import com.tutorial.androidgametutorial.gamestates.Playing;
 import com.tutorial.androidgametutorial.helpers.GameConstants;
 import com.tutorial.androidgametutorial.helpers.HelpMethods;
@@ -28,7 +26,7 @@ public class MapManager {
      */
     public MapManager(Playing playing) {
         this.playing = playing;
-        initTestMap();
+        initStage();
     }
 
     /**
@@ -152,7 +150,7 @@ public class MapManager {
     /**
      * Initializes a test map with predefined tile layouts and entities.
      */
-    private void initTestMap() {
+    private void initStage() {
         int[][] outsideArray = Stages.STAGE_ONE.getOutsideArray();
 
         ArrayList<int[][]> insideMaps = Stages.STAGE_ONE.getInsideMaps();
