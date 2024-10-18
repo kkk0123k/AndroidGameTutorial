@@ -82,20 +82,46 @@ public class HelpMethods {
      */
     public static ArrayList<Skeleton> GetSkeletonsRandomized(int amount, int[][] gameMapArray) {
 
-        int width = (gameMapArray[0].length - 1) * GameConstants.Sprite.SIZE;
-        int height = (gameMapArray.length - 1) * GameConstants.Sprite.SIZE;
+        int width = (gameMapArray[0].length - 2) * GameConstants.Sprite.SIZE; // Adjust for inner tiles
+        int height = (gameMapArray.length - 2) * GameConstants.Sprite.SIZE; // Adjust for inner tiles
 
         ArrayList<Skeleton> skeletonArrayList = new ArrayList<>();
 
         for (int i = 0; i < amount; i++) {
-            float x = (float) (Math.random() * width - GameConstants.Sprite.SIZE);
-            float y = (float) (Math.random() * height - GameConstants.Sprite.SIZE);
+            // Generate random coordinates within inner map boundaries
+            float x = (float) (Math.random() * width + GameConstants.Sprite.SIZE); // Offset for inner tiles
+            float y = (float) (Math.random() * height + GameConstants.Sprite.SIZE); // Offset for inner tiles
+
+            // Additional check to exclude outermost tiles on all sides
+            while (x < GameConstants.Sprite.SIZE || x >= width ||
+                    y < GameConstants.Sprite.SIZE || y >= height) {
+                x = (float) (Math.random() * width + GameConstants.Sprite.SIZE);
+                y = (float) (Math.random() * height + GameConstants.Sprite.SIZE);
+            }
+
             skeletonArrayList.add(new Skeleton(new PointF(x, y)));
         }
 
         return skeletonArrayList;
     }
 
+    private static boolean checkCollisionWithObjects(Skeleton skeleton, GameMap gameMap) {
+        // Check for collisions with buildings
+        for (Building building : gameMap.getBuildingArrayList()) {
+            if (RectF.intersects(skeleton.getHitbox(), building.getHitbox())) {
+                return true; // Collision detected
+            }
+        }
+
+        // Check for collisions with game objects
+        for (GameObject gameObject : gameMap.getGameObjectArrayList()) {
+            if (RectF.intersects(skeleton.getHitbox(), gameObject.getHitbox())) {
+                return true; // Collision detected
+            }
+        }
+
+        return false; // No collisions detected
+    }
     /**
      * Adjusts the Y-coordinate of a hitbox to align with the nearest tile while moving vertically.
      *

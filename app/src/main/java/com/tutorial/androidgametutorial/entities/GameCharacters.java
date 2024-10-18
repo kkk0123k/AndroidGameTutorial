@@ -14,8 +14,8 @@ public enum GameCharacters implements BitmapMethods {
     PLAYER(R.drawable.player_spritesheet),
     SKELETON(R.drawable.skeleton_spritesheet);
 
-    private Bitmap spriteSheet;
-    private Bitmap[][] sprites = new Bitmap[7][4];
+    private final Bitmap spriteSheet;
+    private final Bitmap[][] sprites = new Bitmap[7][4];
 
     /**
      * Constructs a GameCharacter with a specified resource ID for the sprite sheet.

@@ -3,7 +3,7 @@ package com.tutorial.androidgametutorial.entities;
 import android.graphics.PointF;
 
 public class GameObject extends Entity {
-    private GameObjects objectType;
+    private final GameObjects objectType;
 
     /**
      * Constructs a GameObject with a specified position and object type.

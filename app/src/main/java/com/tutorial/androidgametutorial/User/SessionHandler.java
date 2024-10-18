@@ -2,8 +2,16 @@ package com.tutorial.androidgametutorial.User;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
+
+import com.android.volley.Request;
+import com.android.volley.toolbox.JsonObjectRequest;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.Date;
+import java.util.HashMap;
 
 /**
  * Created by AndroidIgniter on 23 Mar 2019 020.
@@ -16,9 +24,9 @@ public class SessionHandler {
     private static final String KEY_FULL_NAME = "full_name";
     private static final String KEY_PROGRESSION = "progression";
     private static final String KEY_EMPTY = "";
-    private Context mContext;
-    private SharedPreferences.Editor mEditor;
-    private SharedPreferences mPreferences;
+    private final Context mContext;
+    private final SharedPreferences.Editor mEditor;
+    private final SharedPreferences mPreferences;
 
     public SessionHandler(Context mContext) {
         this.mContext = mContext;
@@ -42,6 +50,45 @@ public class SessionHandler {
         long millis = date.getTime() + (7 * 24 * 60 * 60 * 1000);
         mEditor.putLong(KEY_EXPIRES, millis);
         mEditor.commit();
+    }
+
+    public void updateProgression(String username, String newProgression) {
+        String url = "http://192.168.1.3/member/update.php"; // Replace with your server address
+
+        HashMap<String, String> params = new HashMap<>();
+        params.put("username", username);
+        params.put("progression", newProgression);
+
+        Log.d("SessionHandler", "start updateProgression"); // Add this line
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url, new JSONObject(params),
+                response -> {
+                    try {
+                        Log.d("SessionHandler", "Server Response: " + response.toString()); // Add this line
+
+                        if (response.getBoolean("success")) {
+                            Log.d("SessionHandler", "Progression updated successfully");
+                            // Progression updated successfully on server
+                            // You can add any UI updates or feedback here (optional)
+                        } else {
+                            String message = response.getString("message");
+                            Log.d("SessionHandler", "Error updating progression: " + message);
+                            // Handle error (e.g., show a message to the user)
+                            // ... display error message to the user ...
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        // Handle JSON parsing error
+                    }
+                },
+                error -> {
+                    error.printStackTrace();
+                    //Handle network error
+                });
+
+        // Debug print for the JSON request
+        Log.d("SessionHandler", "JSON Request: " + new JSONObject(params));
+
+        MySingleton.getInstance(mContext).addToRequestQueue(request);
     }
 
     /**

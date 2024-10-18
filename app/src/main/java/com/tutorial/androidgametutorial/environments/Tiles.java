@@ -16,7 +16,7 @@ public enum Tiles implements BitmapMethods {
     OUTSIDE(R.drawable.tileset_floor, 22, 26), // Represents outside tiles with a specified sprite sheet and dimensions
     INSIDE(R.drawable.floor_inside, 22, 22); // Represents inside tiles with a specified sprite sheet and dimensions
 
-    private Bitmap[] sprites; // Array to hold the individual tile sprites
+    private final Bitmap[] sprites; // Array to hold the individual tile sprites
 
     /**
      * Constructs a Tiles enum with the given resource ID and dimensions.

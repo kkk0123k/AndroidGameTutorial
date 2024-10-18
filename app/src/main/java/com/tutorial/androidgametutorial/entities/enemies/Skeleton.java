@@ -16,10 +16,11 @@ import java.util.Random;
 
 public class Skeleton extends Character {
     private long lastDirChange = System.currentTimeMillis();
-    private Random rand = new Random();
+    private final Random rand = new Random();
     private boolean moving = true, preparingAttack;
     private long timerBeforeAttack, timerAttackDuration;
-    private long timeToAttack = 500, timeForAttackDuration = 250;
+    private final long timeToAttack = 500;
+    private final long timeForAttackDuration = 250;
 
     /**
      * Constructs a Skeleton entity with a specified position.

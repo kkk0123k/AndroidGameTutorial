@@ -12,21 +12,24 @@ import com.tutorial.androidgametutorial.helpers.HelpMethods;
 import com.tutorial.androidgametutorial.main.MainActivity;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Random;
 
 public class MapManager {
 
     private GameMap currentMap;
     private float cameraX, cameraY;
-    private Playing playing;
-
+    private final Playing playing;
+    private final String progression;
     /**
      * Constructs a MapManager to manage the game's maps and camera.
      *
      * @param playing The Playing state of the game.
      */
-    public MapManager(Playing playing) {
+    public MapManager(Playing playing, String progression) {
         this.playing = playing;
-        initStage();
+        this.progression = progression;
+        initStage(progression);
     }
 
     /**
@@ -51,10 +54,7 @@ public class MapManager {
         if (x < 0 || y < 0)
             return false;
 
-        if (x >= getMaxWidthCurrentMap() || y >= getMaxHeightCurrentMap())
-            return false;
-
-        return true;
+        return !(x >= getMaxWidthCurrentMap()) && !(y >= getMaxHeightCurrentMap());
     }
 
     /**
@@ -150,43 +150,80 @@ public class MapManager {
     /**
      * Initializes a test map with predefined tile layouts and entities.
      */
-    private void initStage() {
-        int[][] outsideArray = Stages.STAGE_ONE.getOutsideArray();
+    private void initStage(String progression) {
+        Stages stage = Stages.valueOf(progression); // Get the stage based on progression
 
-        ArrayList<int[][]> insideMaps = Stages.STAGE_ONE.getInsideMaps();
-        int[][] insideArray = insideMaps.get(0); // Assuming the first map is the inside array
-        int[][] insideFlatHouseArray = insideMaps.get(1); // Assuming the second map is the inside flat house array
-        int[][] insideGreenRoofHouseArr = insideMaps.get(2); // Assuming the third map is the inside green roof house array
+        int[][] outsideArray = stage.getOutsideArray();
+        ArrayList<int[][]> insideMaps = stage.getInsideMaps();
+        ArrayList<Building> buildingArrayList = stage.getBuildings();
+        ArrayList<GameObject> gameObjectArrayList = stage.getGameObjects();
 
-        ArrayList<Building> buildingArrayList = Stages.STAGE_ONE.getBuildings();
-        ArrayList<GameObject> gameObjectArrayList = Stages.STAGE_ONE.getGameObjects();
+        int NumberOfEnemyOutside = stage.getNumOfOutsideEnemy();
+        int NumberOfEnemyInside = stage.getNumOfInsideEnemy();
 
-        int NumberOfEnemyOutside = Stages.STAGE_ONE.getNumOfOutsideEnemy();
-        int NumberOfEnemyInside = Stages.STAGE_ONE.getNumOfInsideEnemy();
-        GameMap insideMap = new GameMap(insideArray, Tiles.INSIDE, null, null, HelpMethods.GetSkeletonsRandomized(NumberOfEnemyInside, insideArray));
-        GameMap insideFlatRoofHouseMap = new GameMap(insideFlatHouseArray, Tiles.INSIDE, null, null, null);
-        GameMap insideGreenRoofHouseMap = new GameMap(insideGreenRoofHouseArr, Tiles.INSIDE, null, null, null);
+        // Check if there are inside maps
+        if (insideMaps == null || insideMaps.isEmpty()) {
+            // If no inside maps, clear the building list
+            buildingArrayList.clear();
+        }
 
-        GameMap outsideMap = new GameMap(outsideArray, Tiles.OUTSIDE, buildingArrayList, gameObjectArrayList, HelpMethods.GetSkeletonsRandomized(NumberOfEnemyOutside, outsideArray));
+        // Create the outside map with the associated buildings, game objects, and enemies
+        GameMap outsideMap = new GameMap(outsideArray, Tiles.OUTSIDE,
+                buildingArrayList.isEmpty() ? null : buildingArrayList,
+                gameObjectArrayList,
+                HelpMethods.GetSkeletonsRandomized(NumberOfEnemyOutside, outsideArray));
 
-        HelpMethods.ConnectTwoDoorways(
-                outsideMap,
-                HelpMethods.CreatePointForDoorway(outsideMap, 0),
-                insideMap,
-                HelpMethods.CreatePointForDoorway(3, 6));
+        // Check if inside maps are available
+        if (insideMaps != null && !insideMaps.isEmpty()) {
+            Random random = new Random();
 
-        HelpMethods.ConnectTwoDoorways(
-                outsideMap,
-                HelpMethods.CreatePointForDoorway(outsideMap, 1),
-                insideFlatRoofHouseMap,
-                HelpMethods.CreatePointForDoorway(3, 6));
+            // Create a list to hold the inside maps
+            ArrayList<GameMap> insideGameMaps = new ArrayList<>();
+            int totalEnemiesAssigned = 0; // Track total enemies assigned
 
-        HelpMethods.ConnectTwoDoorways(
-                outsideMap,
-                HelpMethods.CreatePointForDoorway(outsideMap, 2),
-                insideGreenRoofHouseMap,
-                HelpMethods.CreatePointForDoorway(3, 6));
+            // Calculate the average number of enemies per map
+            int averageEnemiesPerMap = NumberOfEnemyInside / insideMaps.size();
+            int remainingEnemies = NumberOfEnemyInside % insideMaps.size();
 
+            // Create an array to hold the number of enemies for each map
+            int[] enemiesPerMap = new int[insideMaps.size()];
+            Arrays.fill(enemiesPerMap, averageEnemiesPerMap);
+
+            // Randomly distribute the remaining enemies
+            for (int i = 0; i < remainingEnemies; i++) {
+                enemiesPerMap[random.nextInt(insideMaps.size())]++;
+            }
+
+            // Loop through each inside map and create a GameMap for each
+            for (int i = 0; i < insideMaps.size(); i++) {
+                int[][] currentInsideArray = insideMaps.get(i);
+                int numEnemies = enemiesPerMap[i];
+
+                totalEnemiesAssigned += numEnemies;
+
+                // Create a new GameMap for each inside map
+                GameMap insideMap = new GameMap(
+                        currentInsideArray,
+                        Tiles.INSIDE,
+                        null,
+                        null,
+                        HelpMethods.GetSkeletonsRandomized(numEnemies, currentInsideArray)
+                );
+
+                // Add the inside map to the list of inside maps
+                insideGameMaps.add(insideMap);
+
+                // Connect the current inside map to the outside map
+                HelpMethods.ConnectTwoDoorways(
+                        outsideMap,
+                        HelpMethods.CreatePointForDoorway(outsideMap, i),
+                        insideMap,
+                        HelpMethods.CreatePointForDoorway(3, 6)
+                );
+            }
+        }
+
+        // Set the current map to the outside map
         currentMap = outsideMap;
     }
 

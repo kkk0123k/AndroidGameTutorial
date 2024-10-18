@@ -1,8 +1,14 @@
 package com.tutorial.androidgametutorial.gamestates;
 
+import static com.tutorial.androidgametutorial.main.MainActivity.getGameContext;
+
 import android.graphics.Canvas;
+import android.util.Log;
 import android.view.MotionEvent;
 
+import com.tutorial.androidgametutorial.User.SessionHandler;
+import com.tutorial.androidgametutorial.User.User;
+import com.tutorial.androidgametutorial.environments.Stages;
 import com.tutorial.androidgametutorial.helpers.interfaces.GameStateInterface;
 import com.tutorial.androidgametutorial.main.Game;
 import com.tutorial.androidgametutorial.main.MainActivity;
@@ -13,28 +19,31 @@ import com.tutorial.androidgametutorial.ui.GameImages;
 /**
  * Represents the Death Screen state of the game, providing options to replay or return to the main menu.
  */
-public class DeathScreen extends BaseState implements GameStateInterface {
+public class VictoryScreen extends BaseState implements GameStateInterface {
 
     private final CustomButton btnReplay;
-    private final CustomButton btnMainMenu; // Buttons for replaying and returning to the main menu
+    private final CustomButton btnMainMenu;
+    private final CustomButton btnNext; // Buttons for replaying and returning to the main menu
 
     private final int menuX = (int) (MainActivity.GAME_WIDTH / 2.5); // X-coordinate for menu background
-    private final int menuY = 200; // Y-coordinate for menu background
+    private final int menuY = 150; // Y-coordinate for menu background
 
     // X and Y coordinates for the buttons based on the menu background size
-    private final int buttonsX = menuX + GameImages.DEATH_MENU_MENUBG.getImage().getWidth() / 2 - ButtonImages.MENU_START.getWidth() / 2;
-    private final int btnReplayY = menuY + 200;
-    private final int btnMainMenuY = btnReplayY + 150; // Y-coordinates for the buttons
+    private final int buttonsX = menuX + GameImages.VICTORY_MENU_MENUBG.getImage().getWidth() / 2 - ButtonImages.MENU_START.getWidth() / 2;
+    private final int btnReplayY = menuY + 220;
+    private final int btnMainMenuY = btnReplayY + 180;
+    private final int btnNextY = btnMainMenuY + 180; // Y-coordinates for the buttons
 
     /**
      * Constructs a DeathScreen with the specified Game instance.
      *
      * @param game The Game instance to associate with this state.
      */
-    public DeathScreen(Game game) {
+    public VictoryScreen(Game game) {
         super(game); // Calls the superclass constructor
         btnReplay = new CustomButton(buttonsX, btnReplayY, ButtonImages.MENU_REPLAY.getWidth(), ButtonImages.MENU_REPLAY.getHeight()); // Initializes replay button
         btnMainMenu = new CustomButton(buttonsX, btnMainMenuY, ButtonImages.MENU_MENU.getWidth(), ButtonImages.MENU_MENU.getHeight()); // Initializes main menu button
+        btnNext = new CustomButton(buttonsX, btnNextY, ButtonImages.VICTORY_NEXT.getWidth(), ButtonImages.VICTORY_NEXT.getHeight()); // Initializes main menu button
     }
 
     /**
@@ -65,6 +74,11 @@ public class DeathScreen extends BaseState implements GameStateInterface {
                 btnMainMenu.getHitbox().left,
                 btnMainMenu.getHitbox().top,
                 null);
+        // Draws the continue button image based on its pressed state
+        c.drawBitmap(ButtonImages.VICTORY_NEXT.getBtnImg(btnNext.isPushed()),
+                btnNext.getHitbox().left,
+                btnNext.getHitbox().top,
+                null);
     }
 
     /**
@@ -74,7 +88,7 @@ public class DeathScreen extends BaseState implements GameStateInterface {
      */
     private void drawBackground(Canvas c) {
         // Draws the death menu background image
-        c.drawBitmap(GameImages.DEATH_MENU_MENUBG.getImage(),
+        c.drawBitmap(GameImages.VICTORY_MENU_MENUBG.getImage(),
                 menuX, menuY, null);
     }
 
@@ -92,6 +106,9 @@ public class DeathScreen extends BaseState implements GameStateInterface {
                 // Checks if the main menu button is pressed
             else if (isIn(event, btnMainMenu))
                 btnMainMenu.setPushed(true); // Sets the button as pushed
+                // Checks if the continue button is pressed
+            else if (isIn(event, btnNext))
+                btnNext.setPushed(true); // Sets the button as pushed
 
         } else if (event.getAction() == MotionEvent.ACTION_UP) {
             // Checks if the replay button was released
@@ -99,7 +116,7 @@ public class DeathScreen extends BaseState implements GameStateInterface {
                 if (btnReplay.isPushed()) {
                     game.setCurrentGameState(Game.GameState.PLAYING); // Sets the game state to playing
                 }
-                    game.getPlaying().reactive(); // Call reactivate() on Playing state
+                game.getPlaying().reactive(); // Call reactivate() on Playing state
 
                 // Checks if the main menu button was released
             } else if (isIn(event, btnMainMenu)) {
@@ -107,11 +124,28 @@ public class DeathScreen extends BaseState implements GameStateInterface {
                     game.setCurrentGameState(Game.GameState.MENU); // Sets the game state to menu
                     game.getPlaying().reactive(); // Call reactivate() on Playing state
                 }
+                // Checks if the next button was released
+            } else if (isIn(event, btnNext)) {
+                if (btnNext.isPushed()) {
+
+                    SessionHandler sessionHandler = new SessionHandler(getGameContext());
+                    User user = sessionHandler.getUserDetails();
+                    String username = user.getUsername();
+                    String progression = user.getProgression();
+                    Stages stage = Stages.valueOf(progression); // Get the stage based on progression
+                    Log.d("MainActivity", "Username: " + username);
+                    user.setProgression(stage.getNextStage()); // Update the progression
+                    // Update progression using the provided method
+                    sessionHandler.updateProgression(username, stage.getNextStage());
+                    game.resetPlaying(user.getProgression());
+                    game.setCurrentGameState(Game.GameState.PLAYING); // Sets the game state to playing
+                }
             }
 
-            // Resets the pushed state of both buttons
+            // Resets the pushed state of all buttons
             btnReplay.setPushed(false);
             btnMainMenu.setPushed(false);
+            btnNext.setPushed(false);
         }
     }
 

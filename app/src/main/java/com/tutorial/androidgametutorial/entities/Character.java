@@ -15,7 +15,7 @@ public abstract class Character extends Entity {
     protected final GameCharacters gameCharType;
     protected boolean attacking, attackChecked;
     private RectF attackBox = null;
-    private int attackDamage;
+    private final int attackDamage;
 
     private int maxHealth;
     private int currentHealth;

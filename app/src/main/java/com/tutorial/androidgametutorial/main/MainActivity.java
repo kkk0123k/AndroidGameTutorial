@@ -7,10 +7,13 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 
 import com.tutorial.androidgametutorial.User.LoginActivity;
+import com.tutorial.androidgametutorial.User.SessionHandler;
+import com.tutorial.androidgametutorial.User.User;
 
 /**
  * Main activity for the game, responsible for setting up the game environment.
@@ -55,8 +58,17 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 1001 && resultCode == RESULT_OK) {
-            // Login successful, proceed with setting up the game
-            setContentView(new GamePanel(this));
+            SessionHandler sessionHandler = new SessionHandler(getApplicationContext());
+            if (sessionHandler.isLoggedIn()) {
+                User user = sessionHandler.getUserDetails();
+                String progression = user.getProgression(); // Get user's progression
+                Log.d("MainActivity", "User progression: " + progression);
+
+                // Proceed with setting up the game
+                setContentView(new GamePanel(this));
+            } else {
+                Log.d("MainActivity", "User is not logged in");
+            }
         }
         // No need to handle other result codes here
     }

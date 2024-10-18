@@ -1,11 +1,17 @@
 package com.tutorial.androidgametutorial.main;
 
+import static com.tutorial.androidgametutorial.main.MainActivity.getGameContext;
+
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 
+import com.tutorial.androidgametutorial.User.SessionHandler;
+import com.tutorial.androidgametutorial.User.User;
 import com.tutorial.androidgametutorial.gamestates.DeathScreen;
+import com.tutorial.androidgametutorial.gamestates.PauseState;
+import com.tutorial.androidgametutorial.gamestates.VictoryScreen;
 import com.tutorial.androidgametutorial.gamestates.Menu;
 import com.tutorial.androidgametutorial.gamestates.Playing;
 
@@ -14,13 +20,17 @@ import com.tutorial.androidgametutorial.gamestates.Playing;
  */
 public class Game {
 
-    private SurfaceHolder holder; // Surface holder for drawing on the canvas
+    private final SurfaceHolder holder; // Surface holder for drawing on the canvas
     private Menu menu; // Menu game state
     private Playing playing; // Playing game state
+    private PauseState pauseState; // Pause state
     private DeathScreen deathScreen; // Death screen game state
-    private GameLoop gameLoop; // Manages the game loop
+    private VictoryScreen victoryScreen;
+    private final GameLoop gameLoop; // Manages the game loop
     private GameState currentGameState = GameState.MENU; // Current game state
-
+    SessionHandler sessionHandler = new SessionHandler(getGameContext());
+    User user = sessionHandler.getUserDetails();
+    String progression = user.getProgression();
     /**
      * Constructs the Game instance with the specified SurfaceHolder.
      *
@@ -42,6 +52,8 @@ public class Game {
             case MENU -> menu.update(delta); // Update menu state
             case PLAYING -> playing.update(delta); // Update playing state
             case DEATH_SCREEN -> deathScreen.update(delta); // Update death screen state
+            case VICTORY_SCREEN -> victoryScreen.update(delta);
+            case PAUSE -> pauseState.update(delta);
         }
     }
 
@@ -57,6 +69,11 @@ public class Game {
             case MENU -> menu.render(c); // Render menu
             case PLAYING -> playing.render(c); // Render playing state
             case DEATH_SCREEN -> deathScreen.render(c); // Render death screen
+            case VICTORY_SCREEN -> victoryScreen.render(c);
+            case PAUSE -> {
+                playing.render(c);
+                pauseState.render(c);
+            }
         }
 
         holder.unlockCanvasAndPost(c); // Unlocks and posts the canvas for display
@@ -67,8 +84,27 @@ public class Game {
      */
     private void initGameStates() {
         menu = new Menu(this); // Initializes the menu state
-        playing = new Playing(this); // Initializes the playing state
+        playing = new Playing(this, progression); // Initializes the playing state
         deathScreen = new DeathScreen(this); // Initializes the death screen state
+        victoryScreen = new VictoryScreen(this);
+        pauseState = new PauseState(this);
+    }
+
+    /**
+     * Sets the Playing instance.
+     *
+     * @param playing The new Playing instance to set.
+     */
+    public void setPlaying(Playing playing) {
+        this.playing = playing;
+    }
+
+    /**
+     * Creates a new Playing instance to reset the game.
+     */
+    public void resetPlaying(String progression) {
+        playing = new Playing(this, progression); // Create a new playing instance
+        this.currentGameState = GameState.PLAYING; // Set the game state to PLAYING
     }
 
     /**
@@ -82,6 +118,8 @@ public class Game {
             case MENU -> menu.touchEvents(event); // Handle touch events for menu
             case PLAYING -> playing.touchEvents(event); // Handle touch events for playing state
             case DEATH_SCREEN -> deathScreen.touchEvents(event); // Handle touch events for death screen
+            case VICTORY_SCREEN -> victoryScreen.touchEvents(event);
+            case PAUSE -> pauseState.touchEvents(event);
         }
 
         return true; // Event handled
@@ -98,7 +136,7 @@ public class Game {
      * Enum representing the possible game states.
      */
     public enum GameState {
-        MENU, PLAYING, DEATH_SCREEN; // Different game states
+        MENU, PLAYING, DEATH_SCREEN, VICTORY_SCREEN, PAUSE // Different game states
     }
 
     /**
@@ -144,5 +182,13 @@ public class Game {
      */
     public DeathScreen getDeathScreen() {
         return deathScreen; // Returns the death screen instance
+    }
+
+    public VictoryScreen getVictoryScreen(){
+        return victoryScreen;
+    }
+
+    public PauseState getPauseState() {
+        return pauseState;
     }
 }

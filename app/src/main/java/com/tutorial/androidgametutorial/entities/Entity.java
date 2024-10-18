@@ -57,6 +57,13 @@ public abstract class Entity implements Comparable<Entity> {
         this.lastCameraYValue = lastCameraYValue;
     }
 
+    public void setPosition(float x, float y) {
+        hitbox.left = x;
+        hitbox.top = y;
+        hitbox.right = x + hitbox.width();
+        hitbox.bottom = y + hitbox.height();
+    }
+
     /**
      * Compares this entity with another entity based on their hitbox positions relative to the camera.
      *

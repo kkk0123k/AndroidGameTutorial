@@ -11,10 +11,12 @@ import com.tutorial.androidgametutorial.main.MainActivity;
 public enum GameImages implements BitmapMethods {
 
     // Enum constants representing different game images with associated drawable resource IDs.
-
     MAINMENU_MENUBG(R.drawable.mainmenu_menubackground),
+    PAUSE_MENU_MENUBG(R.drawable.pause_menu_background),
     DEATH_MENU_MENUBG(R.drawable.menu_youdied_background),
+    VICTORY_MENU_MENUBG(R.drawable.playing_victory_background),
     MENU_BACKGROUND(R.drawable.background);
+
 
     // Private variable to hold the loaded image as a Bitmap.
     private final Bitmap image;

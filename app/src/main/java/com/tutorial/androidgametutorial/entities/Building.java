@@ -4,7 +4,7 @@ import android.graphics.PointF;
 
 public class Building extends Entity {
 
-    private Buildings buildingType;
+    private final Buildings buildingType;
 
     /**
      * Constructs a Building entity with a specified position and building type.

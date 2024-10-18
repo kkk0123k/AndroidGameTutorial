@@ -33,7 +33,7 @@ public class LoginActivity extends AppCompatActivity {
     private String username;
     private String password;
     private ProgressDialog pDialog;
-    private String login_url = "http://192.168.1.3/member/login.php";
+    private final String login_url = "http://192.168.1.3/member/login.php";
     private SessionHandler session;
 
     @Override
@@ -96,7 +96,7 @@ public class LoginActivity extends AppCompatActivity {
             // Populate the request parameters
             request.put(KEY_USERNAME, username);
             request.put(KEY_PASSWORD, password);
-            Log.d(TAG, "Login request parameters: " + request.toString());
+            Log.d(TAG, "Login request parameters: " + request);
         } catch (JSONException e) {
             e.printStackTrace();
             Log.e(TAG, "JSON Exception while creating request: " + e.getMessage());

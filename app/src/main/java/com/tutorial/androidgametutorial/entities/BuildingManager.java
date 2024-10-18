@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 public class BuildingManager {
 
-    private ArrayList<Building> buildingArrayList; // List to store buildings managed by this manager.
+    private final ArrayList<Building> buildingArrayList; // List to store buildings managed by this manager.
     private float cameraX, cameraY; // Camera offset values for rendering.
 
     /**

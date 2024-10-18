@@ -5,8 +5,8 @@ package com.tutorial.androidgametutorial.main;
  */
 public class GameLoop implements Runnable {
 
-    private Thread gameThread; // Thread that runs the game loop
-    private Game game; // Reference to the Game instance
+    private final Thread gameThread; // Thread that runs the game loop
+    private final Game game; // Reference to the Game instance
 
     /**
      * Constructs a GameLoop instance for the specified Game.

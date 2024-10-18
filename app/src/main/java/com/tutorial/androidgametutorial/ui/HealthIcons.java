@@ -18,10 +18,10 @@ public enum HealthIcons implements BitmapMethods {
     HEART_EMPTY(4);
 
     // Bitmap to store the individual heart icon.
-    private Bitmap icon;
+    private final Bitmap icon;
 
     // The width and height for each heart icon, assuming square dimensions.
-    private int widthHeight = 16;
+    private final int widthHeight = 16;
 
     /**
      * Constructor for HealthIcons enum.

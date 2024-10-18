@@ -1,9 +1,9 @@
 package com.tutorial.androidgametutorial.gamestates;
 
 import static com.tutorial.androidgametutorial.helpers.GameConstants.Sprite.X_DRAW_OFFSET;
-import static com.tutorial.androidgametutorial.helpers.GameConstants.Sprite.Y_DRAW_OFFSET;
 import static com.tutorial.androidgametutorial.main.MainActivity.GAME_HEIGHT;
 import static com.tutorial.androidgametutorial.main.MainActivity.GAME_WIDTH;
+import static com.tutorial.androidgametutorial.main.MainActivity.getGameContext;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -12,6 +12,8 @@ import android.graphics.PointF;
 import android.graphics.RectF;
 import android.view.MotionEvent;
 
+import com.tutorial.androidgametutorial.User.SessionHandler;
+import com.tutorial.androidgametutorial.User.User;
 import com.tutorial.androidgametutorial.entities.Building;
 import com.tutorial.androidgametutorial.entities.Character;
 import com.tutorial.androidgametutorial.entities.Entity;
@@ -38,10 +40,11 @@ public class Playing extends BaseState implements GameStateInterface {
     private float cameraX, cameraY;
     private boolean movePlayer;
     private PointF lastTouchDiff;
-    private MapManager mapManager;
-    private Player player;
-    private PlayingUI playingUI;
+    private final MapManager mapManager;
+    private final Player player;
+    private final PlayingUI playingUI;
     private final Paint redPaint, healthBarRed, healthBarBlack;
+    private final PauseState pauseState; // Add this line to hold the PauseState instance
 
     private boolean doorwayJustPassed;
     private Entity[] listOfDrawables;
@@ -52,12 +55,11 @@ public class Playing extends BaseState implements GameStateInterface {
      *
      * @param game The game instance being played.
      */
-    public Playing(Game game) {
+    public Playing(Game game, String progression) {
         super(game);
-
-        mapManager = new MapManager(this);
+        mapManager = new MapManager(this, progression);
         calcStartCameraValues();
-
+        this.pauseState = game.getPauseState();
         player = new Player();
 
         playingUI = new PlayingUI(this);
@@ -254,7 +256,7 @@ public class Playing extends BaseState implements GameStateInterface {
         }
 
         if (allSkeletonsInactive) {
-            game.setCurrentGameState(Game.GameState.DEATH_SCREEN); // Transition to death screen
+            game.setCurrentGameState(Game.GameState.VICTORY_SCREEN); // Transition to death screen
             player.resetCharacterHealth();
         }
     }
@@ -424,6 +426,10 @@ public class Playing extends BaseState implements GameStateInterface {
         game.setCurrentGameState(Game.GameState.MENU);
     }
 
+    public void setGameStateToPause() {
+        game.setCurrentGameState(Game.GameState.PAUSE);
+    }
+
     /**
      * Sets the player's movement to true and records the touch difference.
      *
@@ -469,4 +475,27 @@ public class Playing extends BaseState implements GameStateInterface {
     public PlayingUI getPlayingUI() {
         return playingUI;
     }
+
+    public void reactive() {
+        // Reset player
+        player.resetCharacterHealth();
+        player.setPosition(GAME_WIDTH / 2, GAME_HEIGHT / 2);
+        // Reset camera
+        calcStartCameraValues();
+
+        // Reset skeletons
+        if (mapManager.getCurrentMap().getSkeletonArrayList() != null) {
+            for (Skeleton skeleton : mapManager.getCurrentMap().getSkeletonArrayList()) {
+                skeleton.reactivate();
+                skeleton.setActive(true);
+            }
+        }
+
+        // Reset other game elements (if any)
+        doorwayJustPassed = false;
+        listOfEntitiesMade = false;
+
+    }
+
+
 }

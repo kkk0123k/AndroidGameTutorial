@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
 import com.tutorial.androidgametutorial.R;
+import com.tutorial.androidgametutorial.gamestates.VictoryScreen;
 import com.tutorial.androidgametutorial.helpers.interfaces.BitmapMethods;
 import com.tutorial.androidgametutorial.main.MainActivity;
 
@@ -20,11 +21,16 @@ public enum ButtonImages implements BitmapMethods {
     MENU_CONTINUE(R.drawable.final_mainmenu_button_continue, 300, 140),
     PLAYING_MENU(R.drawable.playing_button_menu, 140, 140),
     MENU_MENU(R.drawable.mainmenu_button_menu, 300, 140),
-    MENU_REPLAY(R.drawable.mainmenu_button_replay, 300, 140);
+    MENU_REPLAY(R.drawable.mainmenu_button_replay, 300, 140),
+    PLAYING_PAUSE(R.drawable.pause_button,140,140),
+    PLAYING_RESUME(R.drawable.playing_button_resume,300,140),
+    VICTORY_NEXT(R.drawable.victory_button_next,300,140);
 
     // Private instance variables to hold width, height, and bitmap representations of the button states.
-    private int width, height;
-    private Bitmap normal, pushed;
+    private final int width;
+    private final int height;
+    private final Bitmap normal;
+    private final Bitmap pushed;
 
     /**
      * Constructor for ButtonImages enum.

@@ -9,7 +9,7 @@ public class Doorway {
     private boolean active = true;
     private final GameMap gameMapLocatedIn;
     private Doorway doorwayConnectedTo;
-    private PointF doorwayPoint;
+    private final PointF doorwayPoint;
 
     /**
      * Constructs a Doorway with a specified location and associated game map.

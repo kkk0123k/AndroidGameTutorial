@@ -37,7 +37,7 @@ public class RegisterActivity extends AppCompatActivity {
     private String confirmPassword;
     private String fullName;
     private ProgressDialog pDialog;
-    private String register_url = "http://192.168.1.3/member/register.php";
+    private final String register_url = "http://192.168.1.3/member/register.php";
     private SessionHandler session;
 
     @Override
@@ -106,35 +106,32 @@ public class RegisterActivity extends AppCompatActivity {
             request.put(KEY_PASSWORD, password);
             request.put(KEY_FULL_NAME, fullName);
             request.put(KEY_PROGRESSION, "STAGE_ONE");
-            Log.d("RegisterActivity", "Request JSON: " + request.toString());
+            Log.d("RegisterActivity", "Request JSON: " + request);
         } catch (JSONException e) {
             e.printStackTrace();
         }
         JsonObjectRequest jsArrayRequest = new JsonObjectRequest
-                (Request.Method.POST, register_url, request, new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        pDialog.dismiss();
-                        try {
-                            //Check if user got registered successfully
-                            if (response.getInt(KEY_STATUS) == 0) {
-                                //Set the user session
-                                String progression = response.getString(KEY_PROGRESSION); // Get progression from response
-                                session.loginUser(username, fullName, progression); // Pass progression to loginUser
-                                finish();
-                            } else if (response.getInt(KEY_STATUS) == 1) {
-                                //Display error message if username is already existing
-                                etUsername.setError("Username already taken!");
-                                etUsername.requestFocus();
+                (Request.Method.POST, register_url, request, response -> {
+                    pDialog.dismiss();
+                    try {
+                        //Check if user got registered successfully
+                        if (response.getInt(KEY_STATUS) == 0) {
+                            //Set the user session
+                            String progression = response.getString(KEY_PROGRESSION); // Get progression from response
+                            session.loginUser(username, fullName, progression); // Pass progression to loginUser
+                            finish();
+                        } else if (response.getInt(KEY_STATUS) == 1) {
+                            //Display error message if username is already existing
+                            etUsername.setError("Username already taken!");
+                            etUsername.requestFocus();
 
-                            } else {
-                                Toast.makeText(getApplicationContext(),
-                                        response.getString(KEY_MESSAGE), Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(getApplicationContext(),
+                                    response.getString(KEY_MESSAGE), Toast.LENGTH_SHORT).show();
 
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
                         }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
                 }, new Response.ErrorListener() {
 

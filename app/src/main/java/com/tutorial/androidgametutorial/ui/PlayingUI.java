@@ -6,10 +6,8 @@ import android.graphics.Paint;
 import android.graphics.PointF;
 import android.view.MotionEvent;
 
-import com.tutorial.androidgametutorial.entities.Character;
 import com.tutorial.androidgametutorial.entities.Player;
 import com.tutorial.androidgametutorial.gamestates.Playing;
-import com.tutorial.androidgametutorial.main.Game;
 
 public class PlayingUI {
 
@@ -24,7 +22,7 @@ public class PlayingUI {
     private int attackBtnPointerId = -1; // Pointer ID for the attack button interaction
     private boolean touchDown; // Flag to track if joystick is being touched
 
-    private CustomButton btnMenu; // Custom button for in-game menu
+    private final CustomButton btnPause; // Custom button for in-game menu
 
     private final Playing playing; // Reference to the Playing class, controlling the game state
 
@@ -49,7 +47,7 @@ public class PlayingUI {
         circlePaint.setStyle(Paint.Style.STROKE); // Draw only the stroke, not the fill
 
         // Initialize the menu button with the appropriate dimensions
-        btnMenu = new CustomButton(5, 5, ButtonImages.PLAYING_MENU.getWidth(), ButtonImages.PLAYING_MENU.getHeight());
+        btnPause = new CustomButton(5, 5, ButtonImages.PLAYING_PAUSE.getWidth(), ButtonImages.PLAYING_PAUSE.getHeight());
     }
 
     /**
@@ -73,9 +71,9 @@ public class PlayingUI {
 
         // Draw the menu button
         c.drawBitmap(
-                ButtonImages.PLAYING_MENU.getBtnImg(btnMenu.isPushed(btnMenu.getPointerId())),
-                btnMenu.getHitbox().left,
-                btnMenu.getHitbox().top,
+                ButtonImages.PLAYING_PAUSE.getBtnImg(btnPause.isPushed(btnPause.getPointerId())),
+                btnPause.getHitbox().left,
+                btnPause.getHitbox().top,
                 null);
 
         // Draw the player's health icons
@@ -177,10 +175,10 @@ public class PlayingUI {
                         attackBtnPointerId = pointerId; // Store the pointer ID for the attack button
                     }
                 }
-                // Check if the menu button was touched
+                // Check if the pause button was touched
                 else {
-                    if (isIn(eventPos, btnMenu))
-                        btnMenu.setPushed(true, pointerId); // Set the menu button to pushed state
+                    if (isIn(eventPos, btnPause))
+                        btnPause.setPushed(true, pointerId); // Set the menu button to pushed state
                 }
             }
 
@@ -201,13 +199,13 @@ public class PlayingUI {
                 if (pointerId == joystickPointerId) {
                     resetJoystickButton(); // Reset the joystick state
                 } else {
-                    // Handle menu button release
-                    if (isIn(eventPos, btnMenu))
-                        if (btnMenu.isPushed(pointerId)) {
+                    // Handle pause button release
+                    if (isIn(eventPos, btnPause))
+                        if (btnPause.isPushed(pointerId)) {
                             resetJoystickButton(); // Reset joystick state
-                            playing.setGameStateToMenu(); // Switch game state to the menu
+                            playing.setGameStateToPause(); // Switch game state to pause
                         }
-                    btnMenu.unPush(pointerId); // Reset the menu button state
+                    btnPause.unPush(pointerId); // Reset the menu button state
                     // Handle attack button release
                     if (pointerId == attackBtnPointerId) {
                         playing.getPlayer().setAttacking(false); // Stop attacking

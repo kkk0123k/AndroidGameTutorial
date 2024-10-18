@@ -12,12 +12,12 @@ import java.util.ArrayList;
 
 public class GameMap {
 
-    private int[][] spriteIds;
-    private Tiles tilesType;
-    private ArrayList<Building> buildingArrayList;
-    private ArrayList<Doorway> doorwayArrayList;
-    private ArrayList<GameObject> gameObjectArrayList;
-    private ArrayList<Skeleton> skeletonArrayList;
+    private final int[][] spriteIds;
+    private final Tiles tilesType;
+    private final ArrayList<Building> buildingArrayList;
+    private final ArrayList<Doorway> doorwayArrayList;
+    private final ArrayList<GameObject> gameObjectArrayList;
+    private final ArrayList<Skeleton> skeletonArrayList;
 
     /**
      * Constructs a GameMap with specified sprite IDs, tile types, and various game entities.
