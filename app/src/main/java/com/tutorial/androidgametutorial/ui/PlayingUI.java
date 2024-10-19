@@ -1,21 +1,26 @@
 package com.tutorial.androidgametutorial.ui;
 
+import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
 import android.view.MotionEvent;
 
+import com.tutorial.androidgametutorial.Music.SoundManager;
 import com.tutorial.androidgametutorial.entities.Player;
 import com.tutorial.androidgametutorial.gamestates.Playing;
+import com.tutorial.androidgametutorial.main.MainActivity;
 
 public class PlayingUI {
 
     // For UI element positions and properties
-    private final PointF joystickCenterPos = new PointF(250, 800); // Center position of the joystick
-    private final PointF attackBtnCenterPos = new PointF(1700, 800); // Center position of the attack button
+    private final PointF joystickCenterPos = new PointF(); // Center position of the joystick
+    private final PointF attackBtnCenterPos = new PointF(); // Center position of the attack button
     private final float radius = 150; // Radius for both joystick and attack button UI
     private final Paint circlePaint; // Paint object for drawing circles (joystick/attack buttons)
+    private final Paint innerCirclePaint = new Paint();
+    private final SoundManager soundManager;
 
     // For handling multitouch
     private int joystickPointerId = -1; // Pointer ID for the joystick interaction
@@ -25,11 +30,10 @@ public class PlayingUI {
     private final CustomButton btnPause; // Custom button for in-game menu
 
     private final Playing playing; // Reference to the Playing class, controlling the game state
+    private MotionEvent event;
 
     // Health icon positions
     private final int healthIconX = 150, healthIconY = 25; // X and Y coordinates for drawing health icons
-//    private int maxPlayerHealth = 600;
-//    private int currentPlayerHealth = 275;
 
     /**
      * Constructor for the PlayingUI class.
@@ -37,15 +41,21 @@ public class PlayingUI {
      *
      * @param playing The Playing class instance, controlling the game's main logic and player interaction.
      */
-    public PlayingUI(Playing playing) {
+    public PlayingUI(Playing playing, SoundManager soundManager) {
         this.playing = playing;
+        this.soundManager = soundManager;
+        // Calculate joystick position based on screen dimensions
+        joystickCenterPos.set(MainActivity.GAME_WIDTH * 0.1f, MainActivity.GAME_HEIGHT * 0.8f);
 
+        // Calculate attack button position based on screen dimensions
+        attackBtnCenterPos.set(MainActivity.GAME_WIDTH * 0.9f, MainActivity.GAME_HEIGHT * 0.8f);
         // Set up paint properties for drawing circles (joystick and attack button)
         circlePaint = new Paint();
-        circlePaint.setColor(Color.RED); // Red outline
-        circlePaint.setStrokeWidth(5); // Stroke width of the circle
-        circlePaint.setStyle(Paint.Style.STROKE); // Draw only the stroke, not the fill
-
+        circlePaint.setColor(Color.argb(128, 128, 128, 128)); // Half-transparent gray
+        circlePaint.setStyle(Paint.Style.FILL); // Fill the circle
+        // Inside the PlayingUI constructor:
+// Inside PlayingUI constructor:
+        innerCirclePaint.setColor(Color.rgb(160, 160, 160)); // Lighter shade of gray        innerCirclePaint.setStyle(Paint.Style.FILL); // Fill the inner circle
         // Initialize the menu button with the appropriate dimensions
         btnPause = new CustomButton(5, 5, ButtonImages.PLAYING_PAUSE.getWidth(), ButtonImages.PLAYING_PAUSE.getHeight());
     }
@@ -69,6 +79,18 @@ public class PlayingUI {
         c.drawCircle(joystickCenterPos.x, joystickCenterPos.y, radius, circlePaint);
         c.drawCircle(attackBtnCenterPos.x, attackBtnCenterPos.y, radius, circlePaint);
 
+        // Draw the inner circle if the joystick is being touched
+        if (touchDown) {
+            int pointerIndex = event.findPointerIndex(joystickPointerId); // Find index of joystick touch
+            if (pointerIndex != -1) {
+                // Get touch coordinates and constrain to joystick area
+                float innerCircleX = Math.min(Math.max(event.getX(pointerIndex), joystickCenterPos.x - radius + radius / 4), joystickCenterPos.x + radius - radius / 4);
+                float innerCircleY = Math.min(Math.max(event.getY(pointerIndex), joystickCenterPos.y - radius + radius / 4), joystickCenterPos.y + radius - radius / 4);
+                // Draw the inner circle
+                c.drawCircle(innerCircleX, innerCircleY, radius / 2, innerCirclePaint);
+            }
+        }
+
         // Draw the menu button
         c.drawBitmap(
                 ButtonImages.PLAYING_PAUSE.getBtnImg(btnPause.isPushed(btnPause.getPointerId())),
@@ -77,6 +99,7 @@ public class PlayingUI {
                 null);
 
         // Draw the player's health icons
+
         drawHealth(c);
     }
 
@@ -156,6 +179,7 @@ public class PlayingUI {
      * @param event The MotionEvent containing all the touch information.
      */
     public void touchEvents(MotionEvent event) {
+        this.event = event;
         final int action = event.getActionMasked(); // Get the type of action (DOWN, MOVE, UP)
         final int actionIndex = event.getActionIndex(); // Index of the current action
         final int pointerId = event.getPointerId(actionIndex); // Get pointer ID for the action
@@ -166,11 +190,14 @@ public class PlayingUI {
         switch (action) {
             case MotionEvent.ACTION_DOWN, MotionEvent.ACTION_POINTER_DOWN -> {
                 // Check if the joystick was touched
-                if (checkInsideJoyStick(eventPos, pointerId))
+                if (checkInsideJoyStick(eventPos, pointerId)) {
+                    soundManager.playActionMusic(SoundManager.PlayerAction.MOVE);
                     touchDown = true;
-                    // Check if the attack button was touched
+                }
+                // Check if the attack button was touched
                 else if (checkInsideAttackBtn(eventPos)) {
                     if (attackBtnPointerId < 0) {
+                        soundManager.playActionMusic(SoundManager.PlayerAction.ATTACK);
                         playing.getPlayer().setAttacking(true); // Set the player to attacking state
                         attackBtnPointerId = pointerId; // Store the pointer ID for the attack button
                     }
@@ -184,7 +211,8 @@ public class PlayingUI {
 
             case MotionEvent.ACTION_MOVE -> {
                 // Handle joystick movement
-                if (touchDown)
+                if (touchDown) {
+                    soundManager.playActionMusic(SoundManager.PlayerAction.MOVE);
                     for (int i = 0; i < event.getPointerCount(); i++) {
                         if (event.getPointerId(i) == joystickPointerId) {
                             // Calculate movement difference from the joystick's center
@@ -193,6 +221,8 @@ public class PlayingUI {
                             playing.setPlayerMoveTrue(new PointF(xDiff, yDiff)); // Set player movement
                         }
                     }
+
+                }
             }
             case MotionEvent.ACTION_UP, MotionEvent.ACTION_POINTER_UP -> {
                 // Handle joystick release
@@ -210,9 +240,15 @@ public class PlayingUI {
                     if (pointerId == attackBtnPointerId) {
                         playing.getPlayer().setAttacking(false); // Stop attacking
                         attackBtnPointerId = -1; // Reset attack button pointer ID
+                        soundManager.stopActionMusic(); // Stop attack sound when released
                     }
                 }
             }
+        }
+
+        // Check for attack state outside the switch statement
+        if (playing.getPlayer().isAttacking() && !soundManager.isAnyActionMusicPlaying()) { // Check if attacking and sound is not playing
+            soundManager.playActionMusic(SoundManager.PlayerAction.ATTACK); // Play attack sound
         }
     }
 
@@ -231,13 +267,10 @@ public class PlayingUI {
      *
      * @param eventPos The touch event position.
      * @param b        The CustomButton to check.
-     * @return True if the touch is inside the button's hitbox, false otherwise.
+     * @return True if the touch is inside the button's hit box, false otherwise.
      */
     private boolean isIn(PointF eventPos, CustomButton b) {
-        return b.getHitbox().contains(eventPos.x, eventPos.y); // Return true if touch is inside the button's hitbox
+        return b.getHitbox().contains(eventPos.x, eventPos.y); // Return true if touch is inside the button's hit box
     }
 
-//    public void resetPlayerHealth() {
-//        this.currentPlayerHealth = maxPlayerHealth;
-//    }
 }

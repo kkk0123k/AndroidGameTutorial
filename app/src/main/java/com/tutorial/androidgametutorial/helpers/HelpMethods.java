@@ -11,6 +11,7 @@ import com.tutorial.androidgametutorial.entities.Player;
 import com.tutorial.androidgametutorial.entities.enemies.Skeleton;
 import com.tutorial.androidgametutorial.environments.Doorway;
 import com.tutorial.androidgametutorial.environments.GameMap;
+import com.tutorial.androidgametutorial.environments.Stages;
 import com.tutorial.androidgametutorial.environments.Tiles;
 
 
@@ -80,7 +81,7 @@ public class HelpMethods {
      * @param gameMapArray A 2D array representing the game map layout.
      * @return An ArrayList of randomly positioned Skeletons.
      */
-    public static ArrayList<Skeleton> GetSkeletonsRandomized(int amount, int[][] gameMapArray) {
+    public static ArrayList<Skeleton> GetSkeletonsRandomized(int amount, int[][] gameMapArray, Stages currentStage) {
 
         int width = (gameMapArray[0].length - 2) * GameConstants.Sprite.SIZE; // Adjust for inner tiles
         int height = (gameMapArray.length - 2) * GameConstants.Sprite.SIZE; // Adjust for inner tiles
@@ -94,7 +95,8 @@ public class HelpMethods {
 
             // Additional check to exclude outermost tiles on all sides
             while (x < GameConstants.Sprite.SIZE || x >= width ||
-                    y < GameConstants.Sprite.SIZE || y >= height) {
+                    y < GameConstants.Sprite.SIZE || y >= height ||
+                    isOverlappingWithEntity(x, y, currentStage)) { // Added overlap check
                 x = (float) (Math.random() * width + GameConstants.Sprite.SIZE);
                 y = (float) (Math.random() * height + GameConstants.Sprite.SIZE);
             }
@@ -105,22 +107,24 @@ public class HelpMethods {
         return skeletonArrayList;
     }
 
-    private static boolean checkCollisionWithObjects(Skeleton skeleton, GameMap gameMap) {
-        // Check for collisions with buildings
-        for (Building building : gameMap.getBuildingArrayList()) {
-            if (RectF.intersects(skeleton.getHitbox(), building.getHitbox())) {
-                return true; // Collision detected
+    private static boolean isOverlappingWithEntity(float x, float y, Stages currentStage) {
+        RectF skeletonHitbox = new RectF(x, y, x + GameConstants.Sprite.HITBOX_SIZE, y + GameConstants.Sprite.HITBOX_SIZE);
+
+        // Check for overlap with buildings
+        for (Building building : currentStage.getBuildings()) {
+            if (RectF.intersects(skeletonHitbox, building.getHitbox())) {
+                return true; // Overlap detected
             }
         }
 
-        // Check for collisions with game objects
-        for (GameObject gameObject : gameMap.getGameObjectArrayList()) {
-            if (RectF.intersects(skeleton.getHitbox(), gameObject.getHitbox())) {
-                return true; // Collision detected
+        // Check for overlap with game objects
+        for (GameObject gameObject : currentStage.getGameObjects()) {
+            if (RectF.intersects(skeletonHitbox, gameObject.getHitbox())) {
+                return true; // Overlap detected
             }
         }
 
-        return false; // No collisions detected
+        return false; // No overlap detected
     }
     /**
      * Adjusts the Y-coordinate of a hitbox to align with the nearest tile while moving vertically.

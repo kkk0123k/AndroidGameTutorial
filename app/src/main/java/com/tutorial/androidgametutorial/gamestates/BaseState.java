@@ -40,4 +40,6 @@ public abstract class BaseState {
     public boolean isIn(MotionEvent e, CustomButton b) {
         return b.getHitbox().contains(e.getX(), e.getY()); // Returns whether the event is inside the button's hitbox
     }
+
+
 }

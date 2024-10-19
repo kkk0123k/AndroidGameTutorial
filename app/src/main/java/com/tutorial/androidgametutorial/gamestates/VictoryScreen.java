@@ -2,6 +2,8 @@ package com.tutorial.androidgametutorial.gamestates;
 
 import static com.tutorial.androidgametutorial.main.MainActivity.getGameContext;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -20,6 +22,9 @@ import com.tutorial.androidgametutorial.ui.GameImages;
  * Represents the Death Screen state of the game, providing options to replay or return to the main menu.
  */
 public class VictoryScreen extends BaseState implements GameStateInterface {
+
+    private static final String PREF_NAME = "UserSession";
+    private static final String KEY_PROGRESSION = "progression";
 
     private final CustomButton btnReplay;
     private final CustomButton btnMainMenu;
@@ -135,10 +140,16 @@ public class VictoryScreen extends BaseState implements GameStateInterface {
                     Stages stage = Stages.valueOf(progression); // Get the stage based on progression
                     Log.d("MainActivity", "Username: " + username);
                     user.setProgression(stage.getNextStage()); // Update the progression
+
+                    // Update Shared Preferences immediately
+                    SharedPreferences sharedPreferences = getGameContext().getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putString(KEY_PROGRESSION, stage.getNextStage());
+                    editor.apply(); // Use apply() for asynchronous update
+
                     // Update progression using the provided method
                     sessionHandler.updateProgression(username, stage.getNextStage());
                     game.resetPlaying(user.getProgression());
-                    game.setCurrentGameState(Game.GameState.PLAYING); // Sets the game state to playing
                 }
             }
 
@@ -147,6 +158,16 @@ public class VictoryScreen extends BaseState implements GameStateInterface {
             btnMainMenu.setPushed(false);
             btnNext.setPushed(false);
         }
+    }
+
+    @Override
+    public void enter() {
+
+    }
+
+    @Override
+    public void exit() {
+
     }
 
     /**

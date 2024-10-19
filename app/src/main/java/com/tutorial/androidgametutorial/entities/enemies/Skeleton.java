@@ -1,8 +1,5 @@
 package com.tutorial.androidgametutorial.entities.enemies;
 
-import static com.tutorial.androidgametutorial.main.MainActivity.GAME_HEIGHT;
-import static com.tutorial.androidgametutorial.main.MainActivity.GAME_WIDTH;
-
 import android.graphics.PointF;
 
 import com.tutorial.androidgametutorial.entities.Character;

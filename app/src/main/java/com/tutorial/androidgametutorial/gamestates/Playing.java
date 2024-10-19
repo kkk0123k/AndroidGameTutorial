@@ -3,7 +3,6 @@ package com.tutorial.androidgametutorial.gamestates;
 import static com.tutorial.androidgametutorial.helpers.GameConstants.Sprite.X_DRAW_OFFSET;
 import static com.tutorial.androidgametutorial.main.MainActivity.GAME_HEIGHT;
 import static com.tutorial.androidgametutorial.main.MainActivity.GAME_WIDTH;
-import static com.tutorial.androidgametutorial.main.MainActivity.getGameContext;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -12,8 +11,7 @@ import android.graphics.PointF;
 import android.graphics.RectF;
 import android.view.MotionEvent;
 
-import com.tutorial.androidgametutorial.User.SessionHandler;
-import com.tutorial.androidgametutorial.User.User;
+import com.tutorial.androidgametutorial.Music.SoundManager;
 import com.tutorial.androidgametutorial.entities.Building;
 import com.tutorial.androidgametutorial.entities.Character;
 import com.tutorial.androidgametutorial.entities.Entity;
@@ -22,7 +20,9 @@ import com.tutorial.androidgametutorial.entities.Player;
 import com.tutorial.androidgametutorial.entities.Weapons;
 import com.tutorial.androidgametutorial.entities.enemies.Skeleton;
 import com.tutorial.androidgametutorial.environments.Doorway;
+import com.tutorial.androidgametutorial.environments.GameMap;
 import com.tutorial.androidgametutorial.environments.MapManager;
+import com.tutorial.androidgametutorial.environments.Stages;
 import com.tutorial.androidgametutorial.helpers.GameConstants;
 import com.tutorial.androidgametutorial.helpers.HelpMethods;
 import com.tutorial.androidgametutorial.helpers.interfaces.GameStateInterface;
@@ -45,24 +45,29 @@ public class Playing extends BaseState implements GameStateInterface {
     private final PlayingUI playingUI;
     private final Paint redPaint, healthBarRed, healthBarBlack;
     private final PauseState pauseState; // Add this line to hold the PauseState instance
+    private Stages stage;
 
     private boolean doorwayJustPassed;
     private Entity[] listOfDrawables;
     private boolean listOfEntitiesMade;
+
+    private final SoundManager soundManager; // SoundManager instance
 
     /**
      * Initializes the Playing state with the game instance.
      *
      * @param game The game instance being played.
      */
-    public Playing(Game game, String progression) {
+    public Playing(Game game, String progression, SoundManager soundManager) {
         super(game);
         mapManager = new MapManager(this, progression);
+        this.soundManager = soundManager;
         calcStartCameraValues();
         this.pauseState = game.getPauseState();
         player = new Player();
+        stage = Stages.valueOf(progression);
 
-        playingUI = new PlayingUI(this);
+        playingUI = new PlayingUI(this, soundManager);
 
         redPaint = new Paint();
         redPaint.setStrokeWidth(1);
@@ -184,12 +189,12 @@ public class Playing extends BaseState implements GameStateInterface {
      */
     private void checkEnemyAttack(Character character) {
         character.updateWepHitbox();
-        RectF playerHitbox = new RectF(player.getHitbox());
-        playerHitbox.left -= cameraX;
-        playerHitbox.top -= cameraY;
-        playerHitbox.right -= cameraX;
-        playerHitbox.bottom -= cameraY;
-        if (RectF.intersects(character.getAttackBox(), playerHitbox)) {
+        RectF playerHitBox = new RectF(player.getHitbox());
+        playerHitBox.left -= cameraX;
+        playerHitBox.top -= cameraY;
+        playerHitBox.right -= cameraX;
+        playerHitBox.bottom -= cameraY;
+        if (RectF.intersects(character.getAttackBox(), playerHitBox)) {
             System.out.println("Enemy Hit Player!");
             player.damageCharacter(character.getDamage());
             checkPlayerDead();
@@ -246,17 +251,22 @@ public class Playing extends BaseState implements GameStateInterface {
     private void checkActiveSkeletons() {
         boolean allSkeletonsInactive = true;
 
-        if (mapManager.getCurrentMap().getSkeletonArrayList() != null) {
-            for (Skeleton skeleton : mapManager.getCurrentMap().getSkeletonArrayList()) {
-                if (skeleton.isActive()) {
-                    allSkeletonsInactive = false;
-                    break; // Exit early if at least one skeleton is active.
+        for (GameMap map : mapManager.getAllMaps()) { // Iterate through all maps
+            if (map.getSkeletonArrayList() != null) {
+                for (Skeleton skeleton : map.getSkeletonArrayList()) {
+                    if (skeleton.isActive()) {
+                        allSkeletonsInactive = false;
+                        break; // Exit early if at least one skeleton is active
+                    }
+                }
+                if (!allSkeletonsInactive) {
+                    break; // Exit outer loop if any skeleton is active
                 }
             }
         }
 
         if (allSkeletonsInactive) {
-            game.setCurrentGameState(Game.GameState.VICTORY_SCREEN); // Transition to death screen
+            game.setCurrentGameState(Game.GameState.VICTORY_SCREEN); // Transition to victory screen
             player.resetCharacterHealth();
         }
     }
@@ -427,6 +437,7 @@ public class Playing extends BaseState implements GameStateInterface {
     }
 
     public void setGameStateToPause() {
+        exit();
         game.setCurrentGameState(Game.GameState.PAUSE);
     }
 
@@ -483,19 +494,29 @@ public class Playing extends BaseState implements GameStateInterface {
         // Reset camera
         calcStartCameraValues();
 
-        // Reset skeletons
-        if (mapManager.getCurrentMap().getSkeletonArrayList() != null) {
-            for (Skeleton skeleton : mapManager.getCurrentMap().getSkeletonArrayList()) {
-                skeleton.reactivate();
-                skeleton.setActive(true);
+        // Reset skeletons in all maps
+        for (GameMap map : mapManager.getAllMaps()) {
+            if (map.getSkeletonArrayList() != null) {
+                for (Skeleton skeleton : map.getSkeletonArrayList()) {
+                    skeleton.reactivate();
+                    skeleton.setActive(true);
+                }
             }
         }
 
         // Reset other game elements (if any)
         doorwayJustPassed = false;
         listOfEntitiesMade = false;
-
     }
 
+    @Override
+    public void enter() {
+            soundManager.playBGPlayingMusic();
+    }
+
+    @Override
+    public void exit() {
+            soundManager.stopBGPlayingMusic();
+    }
 
 }

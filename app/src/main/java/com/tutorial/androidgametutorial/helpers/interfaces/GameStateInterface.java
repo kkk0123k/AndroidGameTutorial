@@ -27,4 +27,8 @@ public interface GameStateInterface {
      */
     void touchEvents(MotionEvent event);
 
+    void enter();
+
+    void exit();
+
 }

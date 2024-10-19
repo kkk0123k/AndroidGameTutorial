@@ -13,6 +13,7 @@ import com.tutorial.androidgametutorial.main.MainActivity;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 
 public class MapManager {
@@ -21,6 +22,7 @@ public class MapManager {
     private float cameraX, cameraY;
     private final Playing playing;
     private final String progression;
+    private List<GameMap> allMaps = new ArrayList<>(); // Store all maps
     /**
      * Constructs a MapManager to manage the game's maps and camera.
      *
@@ -109,12 +111,12 @@ public class MapManager {
     /**
      * Checks if the player is currently inside a doorway.
      *
-     * @param playerHitbox The hitbox of the player.
+     * @param playerHitBox The hit box of the player.
      * @return The Doorway if the player is inside, otherwise null.
      */
-    public Doorway isPlayerOnDoorway(RectF playerHitbox) {
+    public Doorway isPlayerOnDoorway(RectF playerHitBox) {
         for (Doorway doorway : currentMap.getDoorwayArrayList())
-            if (doorway.isPlayerInsideDoorway(playerHitbox, cameraX, cameraY))
+            if (doorway.isPlayerInsideDoorway(playerHitBox, cameraX, cameraY))
                 return doorway;
 
         return null;
@@ -147,6 +149,10 @@ public class MapManager {
         return currentMap;
     }
 
+    public List<GameMap> getAllMaps() {
+        return allMaps;
+    }
+
     /**
      * Initializes a test map with predefined tile layouts and entities.
      */
@@ -157,6 +163,7 @@ public class MapManager {
         ArrayList<int[][]> insideMaps = stage.getInsideMaps();
         ArrayList<Building> buildingArrayList = stage.getBuildings();
         ArrayList<GameObject> gameObjectArrayList = stage.getGameObjects();
+        ArrayList<GameMap> insideGameMaps = new ArrayList<>();
 
         int NumberOfEnemyOutside = stage.getNumOfOutsideEnemy();
         int NumberOfEnemyInside = stage.getNumOfInsideEnemy();
@@ -171,14 +178,13 @@ public class MapManager {
         GameMap outsideMap = new GameMap(outsideArray, Tiles.OUTSIDE,
                 buildingArrayList.isEmpty() ? null : buildingArrayList,
                 gameObjectArrayList,
-                HelpMethods.GetSkeletonsRandomized(NumberOfEnemyOutside, outsideArray));
+                HelpMethods.GetSkeletonsRandomized(NumberOfEnemyOutside, outsideArray, stage));
 
         // Check if inside maps are available
         if (insideMaps != null && !insideMaps.isEmpty()) {
             Random random = new Random();
 
             // Create a list to hold the inside maps
-            ArrayList<GameMap> insideGameMaps = new ArrayList<>();
             int totalEnemiesAssigned = 0; // Track total enemies assigned
 
             // Calculate the average number of enemies per map
@@ -207,7 +213,7 @@ public class MapManager {
                         Tiles.INSIDE,
                         null,
                         null,
-                        HelpMethods.GetSkeletonsRandomized(numEnemies, currentInsideArray)
+                        HelpMethods.GetSkeletonsRandomized(numEnemies, currentInsideArray, stage)
                 );
 
                 // Add the inside map to the list of inside maps
@@ -223,6 +229,11 @@ public class MapManager {
             }
         }
 
+        // Add all created maps to the list
+        allMaps.add(outsideMap);
+        if (insideMaps != null && !insideMaps.isEmpty()) {
+            allMaps.addAll(insideGameMaps); // Add inside maps to the list
+        }
         // Set the current map to the outside map
         currentMap = outsideMap;
     }

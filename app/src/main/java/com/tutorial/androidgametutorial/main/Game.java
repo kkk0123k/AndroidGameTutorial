@@ -7,10 +7,12 @@ import android.graphics.Color;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 
+import com.tutorial.androidgametutorial.Music.SoundManager;
 import com.tutorial.androidgametutorial.User.SessionHandler;
 import com.tutorial.androidgametutorial.User.User;
 import com.tutorial.androidgametutorial.gamestates.DeathScreen;
 import com.tutorial.androidgametutorial.gamestates.PauseState;
+import com.tutorial.androidgametutorial.gamestates.SettingScreen;
 import com.tutorial.androidgametutorial.gamestates.VictoryScreen;
 import com.tutorial.androidgametutorial.gamestates.Menu;
 import com.tutorial.androidgametutorial.gamestates.Playing;
@@ -26,11 +28,14 @@ public class Game {
     private PauseState pauseState; // Pause state
     private DeathScreen deathScreen; // Death screen game state
     private VictoryScreen victoryScreen;
+    private SettingScreen settingScreen;
     private final GameLoop gameLoop; // Manages the game loop
     private GameState currentGameState = GameState.MENU; // Current game state
+    public final SoundManager soundManager;
     SessionHandler sessionHandler = new SessionHandler(getGameContext());
     User user = sessionHandler.getUserDetails();
     String progression = user.getProgression();
+
     /**
      * Constructs the Game instance with the specified SurfaceHolder.
      *
@@ -38,6 +43,7 @@ public class Game {
      */
     public Game(SurfaceHolder holder) {
         this.holder = holder; // Assign surface holder
+        this.soundManager = new SoundManager(getGameContext()); // Initialize SoundManager
         gameLoop = new GameLoop(this); // Initialize game loop
         initGameStates(); // Initialize game states
     }
@@ -54,6 +60,7 @@ public class Game {
             case DEATH_SCREEN -> deathScreen.update(delta); // Update death screen state
             case VICTORY_SCREEN -> victoryScreen.update(delta);
             case PAUSE -> pauseState.update(delta);
+            case SETTINGS -> settingScreen.update(delta);
         }
     }
 
@@ -62,8 +69,9 @@ public class Game {
      */
     public void render() {
         Canvas c = holder.lockCanvas(); // Locks the canvas for drawing
-        c.drawColor(Color.BLACK); // Clears the canvas with black color
-
+        if (c != null) {
+            c.drawColor(Color.BLACK);
+        }
         // Draw the current game state
         switch (currentGameState) {
             case MENU -> menu.render(c); // Render menu
@@ -74,22 +82,49 @@ public class Game {
                 playing.render(c);
                 pauseState.render(c);
             }
+            case SETTINGS -> {
+                settingScreen.render(c);
+            }
         }
 
         holder.unlockCanvasAndPost(c); // Unlocks and posts the canvas for display
     }
-
     /**
      * Initializes the game states.
      */
     private void initGameStates() {
-        menu = new Menu(this); // Initializes the menu state
-        playing = new Playing(this, progression); // Initializes the playing state
+        menu = new Menu(this, soundManager);; // Initializes the menu state
+        playing = new Playing(this, progression, soundManager); // Initializes the playing state
         deathScreen = new DeathScreen(this); // Initializes the death screen state
         victoryScreen = new VictoryScreen(this);
         pauseState = new PauseState(this);
+        settingScreen = new SettingScreen(this);
+        enterCurrentState(); // Call enterCurrentState() after initialization
     }
 
+
+    public void enterCurrentState() {
+        switch (currentGameState) {
+            case MENU:
+                menu.enter();
+                break;
+            case PLAYING:
+                playing.enter();
+                break;
+            case DEATH_SCREEN:
+                deathScreen.enter();
+                break;
+            case VICTORY_SCREEN:
+                victoryScreen.enter();
+                break;
+            case PAUSE:
+                pauseState.enter();
+                break;
+            case SETTINGS:
+                settingScreen.enter();
+                break;
+        }
+    }
     /**
      * Sets the Playing instance.
      *
@@ -103,8 +138,9 @@ public class Game {
      * Creates a new Playing instance to reset the game.
      */
     public void resetPlaying(String progression) {
-        playing = new Playing(this, progression); // Create a new playing instance
+        playing = new Playing(this, progression, soundManager); // Create a new playing instance
         this.currentGameState = GameState.PLAYING; // Set the game state to PLAYING
+        enterCurrentState(); // Call enterCurrentState() after changing state
     }
 
     /**
@@ -136,7 +172,7 @@ public class Game {
      * Enum representing the possible game states.
      */
     public enum GameState {
-        MENU, PLAYING, DEATH_SCREEN, VICTORY_SCREEN, PAUSE // Different game states
+        MENU, PLAYING, DEATH_SCREEN, VICTORY_SCREEN, PAUSE, SETTINGS // Different game states
     }
 
     /**
@@ -173,6 +209,10 @@ public class Game {
      */
     public Playing getPlaying() {
         return playing; // Returns the playing instance
+    }
+
+    public SettingScreen getSettingScreen() {
+        return settingScreen;
     }
 
     /**

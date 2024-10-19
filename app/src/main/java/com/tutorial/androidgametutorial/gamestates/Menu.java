@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.view.MotionEvent;
 
+import com.tutorial.androidgametutorial.Music.SoundManager;
 import com.tutorial.androidgametutorial.User.SessionHandler;
 import com.tutorial.androidgametutorial.User.User;
 import com.tutorial.androidgametutorial.helpers.interfaces.GameStateInterface;
@@ -17,9 +18,6 @@ import com.tutorial.androidgametutorial.ui.ButtonImages;
 import com.tutorial.androidgametutorial.ui.CustomButton;
 import com.tutorial.androidgametutorial.ui.GameImages;
 
-/**
- * Represents the main menu state of the game, providing an option to start the game.
- */
 public class Menu extends BaseState implements GameStateInterface {
 
     private static final String PREF_NAME = "UserSession";
@@ -27,7 +25,7 @@ public class Menu extends BaseState implements GameStateInterface {
 
     private final CustomButton btnStart; // Button for starting the game
     private final CustomButton btnContinue;
-    private final Bitmap background; // Variable to hold the background image
+    private final CustomButton btnSettings;
     private final Bitmap scaledBackground;
 
     private final int menuX = MainActivity.GAME_WIDTH / 6; // X-coordinate for menu background
@@ -41,34 +39,27 @@ public class Menu extends BaseState implements GameStateInterface {
     private final int btnContinueX = menuX + GameImages.MAINMENU_MENUBG.getImage().getWidth() / 2 - ButtonImages.MENU_CONTINUE.getWidth() / 2;
     private final int btnContinueY = btnStartY + ButtonImages.MENU_START.getHeight() + 40; // Y-coordinate for the continue button (20 pixels below the start button)
 
-    /**
-     * Constructs a Menu with the specified Game instance.
-     *
-     * @param game The Game instance to associate with this state.
-     */
-    public Menu(Game game) {
-        super(game); // Calls the superclass constructor
+    private final int btnSettingsX = menuX + GameImages.MAINMENU_MENUBG.getImage().getWidth() / 2 - ButtonImages.MENU_SETTINGS.getWidth() / 2;
+    private final int btnSettingsY = btnContinueY + ButtonImages.MENU_CONTINUE.getHeight() + 40;
+
+    private final SoundManager soundManager; // SoundManager instance
+
+    public Menu(Game game, SoundManager soundManager) { // Modified constructor
+        super(game);
+        this.soundManager = soundManager;
         btnStart = new CustomButton(btnStartX, btnStartY, ButtonImages.MENU_START.getWidth(), ButtonImages.MENU_START.getHeight()); // Initializes the start button
         btnContinue = new CustomButton(btnContinueX, btnContinueY, ButtonImages.MENU_START.getWidth(), ButtonImages.MENU_CONTINUE.getHeight()); // Initializes the start button
-        background = GameImages.MENU_BACKGROUND.getImage();
+        btnSettings = new CustomButton(btnSettingsX, btnSettingsY, ButtonImages.MENU_SETTINGS.getWidth(), ButtonImages.MENU_SETTINGS.getHeight()); // Initializes the start button
+        // Variable to hold the background image
+        Bitmap background = GameImages.MENU_BACKGROUND.getImage();
         scaledBackground = Bitmap.createScaledBitmap(background, MainActivity.GAME_WIDTH, MainActivity.GAME_HEIGHT, true);
     }
 
-    /**
-     * Updates the state of the Menu. Currently does nothing.
-     *
-     * @param delta The time since the last update.
-     */
     @Override
     public void update(double delta) {
         // No updates needed for the Menu
     }
 
-    /**
-     * Renders the Menu, including the background and the start button.
-     *
-     * @param c The Canvas on which to draw the menu.
-     */
     @Override
     public void render(Canvas c) {
 
@@ -95,18 +86,13 @@ public class Menu extends BaseState implements GameStateInterface {
                 btnContinue.getHitbox().left,
                 btnContinue.getHitbox().top,
                 null);
+        c.drawBitmap(
+                ButtonImages.MENU_SETTINGS.getBtnImg(btnSettings.isPushed()),
+                btnSettings.getHitbox().left,
+                btnSettings.getHitbox().top,
+                null);
     }
 
-    /**
-     * Handles touch events for the start button in the Menu.
-     *
-     * @param event The MotionEvent representing the touch action.
-     */
-    /**
-     * Handles touch events for the start and continue buttons in the Menu.
-     *
-     * @param event The MotionEvent representing the touch action.
-     */
     @Override
     public void touchEvents(MotionEvent event) {
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
@@ -114,10 +100,12 @@ public class Menu extends BaseState implements GameStateInterface {
             if (isIn(event, btnStart)) {
                 btnStart.setPushed(true); // Sets the start button as pushed
             }
-
             // Checks if the continue button is pressed
-            if (isIn(event, btnContinue)) {
+            else if (isIn(event, btnContinue)) {
                 btnContinue.setPushed(true); // Sets the continue button as pushed
+            }
+            else if (isIn(event, btnSettings)) {
+                btnSettings.setPushed(true); // Sets the continue button as pushed
             }
         } else if (event.getAction() == MotionEvent.ACTION_UP) {
             // Checks if the start button was released
@@ -138,21 +126,32 @@ public class Menu extends BaseState implements GameStateInterface {
 
                 // Refresh the User object (might not be necessary anymore)
                 // user = sessionHandler.getUserDetails(); // Get the updated User object
-
+                exit();
                 game.resetPlaying("STAGE_ONE");
-            }
-
-            // Checks if the continue button was released
-            if (isIn(event, btnContinue) && btnContinue.isPushed()) {
+            } // Checks if the continue button was released
+            else if (isIn(event, btnContinue) && btnContinue.isPushed()) {
                 SessionHandler sessionHandler = new SessionHandler(getGameContext());
                 User user = sessionHandler.getUserDetails();
+                exit();
                 game.resetPlaying(user.getProgression());
+            } else if (isIn(event, btnSettings) && btnSettings.isPushed()) {
+
             }
 
             // Resets the pushed state of the buttons
             btnStart.setPushed(false);
             btnContinue.setPushed(false);
+            btnSettings.setPushed(false);
         }
     }
 
+    @Override
+    public void enter() {
+        soundManager.playBGMenuMusic(); // Play menu music when entering the state
+    }
+
+    @Override
+    public void exit() {
+        soundManager.stopBGMenuMusic(); // Stop menu music when exiting the state
+    }
 }

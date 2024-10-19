@@ -13,11 +13,10 @@ import com.tutorial.androidgametutorial.ui.GameImages;
 /**
  * Represents the Pause Screen state of the game, providing options to resume or return to the main menu.
  */
-public class PauseState extends BaseState implements GameStateInterface {
+public class SettingScreen extends BaseState implements GameStateInterface {
 
     private final CustomButton btnResume;
     private final CustomButton btnMainMenu; // Buttons for resuming and returning to the main menu
-    private final CustomButton btnSettings;
     private final int menuX = (int) (MainActivity.GAME_WIDTH / 2.5); // X-coordinate for menu background
     private final int menuY = 200; // Y-coordinate for menu background
 
@@ -25,18 +24,16 @@ public class PauseState extends BaseState implements GameStateInterface {
     private final int buttonsX = menuX + GameImages.PAUSE_MENU_MENUBG.getImage().getWidth() / 2 - ButtonImages.MENU_START.getWidth() / 2;
     private final int btnResumeY = menuY + 200;
     private final int btnMainMenuY = btnResumeY + 180; // Y-coordinates for the buttons
-    private final int btnSettingsY = btnMainMenuY + 180;
 
     /**
      * Constructs a PauseState with the specified Game instance.
      *
      * @param game The Game instance to associate with this state.
      */
-    public PauseState(Game game) {
+    public SettingScreen(Game game) {
         super(game);
         btnResume = new CustomButton(buttonsX, btnResumeY, ButtonImages.PLAYING_RESUME.getWidth(), ButtonImages.PLAYING_RESUME.getHeight()); // Initializes resume button
         btnMainMenu = new CustomButton(buttonsX, btnMainMenuY, ButtonImages.MENU_MENU.getWidth(), ButtonImages.MENU_MENU.getHeight()); // Initializes main menu button
-        btnSettings = new CustomButton(buttonsX, btnSettingsY, ButtonImages.MENU_SETTINGS.getWidth(), ButtonImages.MENU_SETTINGS.getHeight()); // Initializes settings button
     }
 
     /**
@@ -65,11 +62,6 @@ public class PauseState extends BaseState implements GameStateInterface {
                 btnMainMenu.getHitbox().left,
                 btnMainMenu.getHitbox().top,
                 null);
-
-        c.drawBitmap(ButtonImages.MENU_SETTINGS.getBtnImg(btnSettings.isPushed()),
-                btnSettings.getHitbox().left,
-                btnSettings.getHitbox().top,
-                null);
     }
 
     /**
@@ -89,13 +81,10 @@ public class PauseState extends BaseState implements GameStateInterface {
     @Override
     public void touchEvents(MotionEvent event) {
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
-            if (isIn(event, btnResume)) {
+            if (isIn(event, btnResume))
                 btnResume.setPushed(true);
-            } else if (isIn(event, btnMainMenu)) {
+            else if (isIn(event, btnMainMenu))
                 btnMainMenu.setPushed(true);
-            } else if (isIn(event, btnSettings)) {
-                btnSettings.setPushed(true);
-            }
 
         } else if (event.getAction() == MotionEvent.ACTION_UP) {
             if (isIn(event, btnResume)) {
@@ -109,15 +98,9 @@ public class PauseState extends BaseState implements GameStateInterface {
                     game.enterCurrentState();
                     game.getPlaying().reactive(); // Call reset() on Playing state
                 }
-            } else if (isIn(event, btnSettings)) {
-                if (btnSettings.isPushed()) {
-                    game.setCurrentGameState(Game.GameState.SETTINGS);
-                    game.enterCurrentState();
-                }
             }
             btnResume.setPushed(false);
             btnMainMenu.setPushed(false);
-            btnSettings.setPushed(false);
         }
     }
 

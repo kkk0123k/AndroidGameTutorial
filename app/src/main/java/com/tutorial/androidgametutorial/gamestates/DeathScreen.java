@@ -115,6 +115,16 @@ public class DeathScreen extends BaseState implements GameStateInterface {
         }
     }
 
+    @Override
+    public void enter() {
+
+    }
+
+    @Override
+    public void exit() {
+
+    }
+
     /**
      * Updates the state of the Death Screen. Currently does nothing.
      *
