@@ -115,27 +115,35 @@ public class SoundManager {
     }
 
     public void setBackgroundMusicVolume(float volume) {
-        BGPlayingMusicPlayer.setVolume(volume, volume);
-        BGMenuMusicPlayer.setVolume(volume, volume); // Apply to menu music as well
+        if (BGPlayingMusicPlayer != null) {
+            BGPlayingMusicPlayer.setVolume(volume, volume);
+        }
+        if (BGMenuMusicPlayer != null) {
+            BGMenuMusicPlayer.setVolume(volume, volume);
+        }
     }
 
     public void setActionMusicVolume(float volume) {
-        moveMusicPlayer.setVolume(volume, volume);
-        attackMusicPlayer.setVolume(volume, volume);
-        getAttackedMusicPlayer.setVolume(volume, volume);
+        if (isAnyActionMusicPlaying()) { // Check if any action music is playing
+            if (isPlaying(PlayerAction.MOVE)) {
+                moveMusicPlayer.setVolume(volume, volume);
+            }
+            if (isPlaying(PlayerAction.ATTACK)) {
+                attackMusicPlayer.setVolume(volume, volume);
+            }
+            if (isPlaying(PlayerAction.GET_ATTACKED)) {
+                getAttackedMusicPlayer.setVolume(volume, volume);
+            }
+        }
     }
 
     public boolean isPlaying(PlayerAction action) {
-        switch (action) {
-            case MOVE:
-                return moveMusicPlayer.isPlaying();
-            case ATTACK:
-                return attackMusicPlayer.isPlaying();
-            case GET_ATTACKED:
-                return getAttackedMusicPlayer.isPlaying();
-            default:
-                return false;
-        }
+        return switch (action) {
+            case MOVE -> moveMusicPlayer.isPlaying();
+            case ATTACK -> attackMusicPlayer.isPlaying();
+            case GET_ATTACKED -> getAttackedMusicPlayer.isPlaying();
+            default -> false;
+        };
     }
 
     public void stopActionMusic(PlayerAction action) {

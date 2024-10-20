@@ -39,14 +39,14 @@ public class GameLoop implements Runnable {
             game.render(); // Render the game on the canvas
             lastDelta = nowDelta; // Update the last update time
 
-            // FPS calculation (commented out)
-            // fps++;
-            // long now = System.currentTimeMillis();
-            // if (now - lastFPSCheck >= 1000) {
-            //     System.out.println("FPS: " + fps); // Print the current FPS
-            //     fps = 0; // Reset the FPS counter
-            //     lastFPSCheck += 1000; // Update the FPS check time
-            // }
+             //FPS calculation (commented out)
+             fps++;
+             long now = System.currentTimeMillis();
+             if (now - lastFPSCheck >= 1000) {
+                 System.out.println("FPS: " + fps); // Print the current FPS
+                 fps = 0; // Reset the FPS counter
+                 lastFPSCheck += 1000; // Update the FPS check time
+             }
         }
     }
 

@@ -313,7 +313,6 @@ public class Playing extends BaseState implements GameStateInterface {
     private void drawPlayer(Canvas c) {
         c.drawBitmap(Weapons.SHADOW.getWeaponImg(), player.getHitbox().left, player.getHitbox().bottom - 5 * GameConstants.Sprite.SCALE_MULTIPLIER, null);
         c.drawBitmap(player.getGameCharType().getSprite(player.getAniIndex(), player.getFaceDir()), player.getHitbox().left - X_DRAW_OFFSET, player.getHitbox().top - GameConstants.Sprite.Y_DRAW_OFFSET, null);
-        c.drawRect(player.getHitbox(), redPaint);
         if (player.isAttacking()) drawWeapon(c, player);
     }
 
@@ -327,7 +326,6 @@ public class Playing extends BaseState implements GameStateInterface {
         c.rotate(character.getWepRot(), character.getAttackBox().left, character.getAttackBox().top);
         c.drawBitmap(Weapons.BIG_SWORD.getWeaponImg(), character.getAttackBox().left + character.wepRotAdjustLeft(), character.getAttackBox().top + character.wepRotAdjustTop(), null);
         c.rotate(character.getWepRot() * -1, character.getAttackBox().left, character.getAttackBox().top);
-        c.drawRect(character.getAttackBox(), redPaint);
     }
 
 

@@ -1,6 +1,8 @@
 package com.tutorial.androidgametutorial.ui;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -8,6 +10,7 @@ import android.graphics.PointF;
 import android.view.MotionEvent;
 
 import com.tutorial.androidgametutorial.Music.SoundManager;
+import com.tutorial.androidgametutorial.R;
 import com.tutorial.androidgametutorial.entities.Player;
 import com.tutorial.androidgametutorial.gamestates.Playing;
 import com.tutorial.androidgametutorial.main.MainActivity;
@@ -18,9 +21,11 @@ public class PlayingUI {
     private final PointF joystickCenterPos = new PointF(); // Center position of the joystick
     private final PointF attackBtnCenterPos = new PointF(); // Center position of the attack button
     private final float radius = 150; // Radius for both joystick and attack button UI
-    private final Paint circlePaint; // Paint object for drawing circles (joystick/attack buttons)
+    private final Paint joystickPaint; // Paint object for drawing the joystick
+    private final Paint attackButtonPaint; // Paint object for drawing the attack button
     private final Paint innerCirclePaint = new Paint();
     private final SoundManager soundManager;
+    private Bitmap swordImage;
 
     // For handling multitouch
     private int joystickPointerId = -1; // Pointer ID for the joystick interaction
@@ -50,12 +55,17 @@ public class PlayingUI {
         // Calculate attack button position based on screen dimensions
         attackBtnCenterPos.set(MainActivity.GAME_WIDTH * 0.9f, MainActivity.GAME_HEIGHT * 0.8f);
         // Set up paint properties for drawing circles (joystick and attack button)
-        circlePaint = new Paint();
-        circlePaint.setColor(Color.argb(128, 128, 128, 128)); // Half-transparent gray
-        circlePaint.setStyle(Paint.Style.FILL); // Fill the circle
-        // Inside the PlayingUI constructor:
-// Inside PlayingUI constructor:
-        innerCirclePaint.setColor(Color.rgb(160, 160, 160)); // Lighter shade of gray        innerCirclePaint.setStyle(Paint.Style.FILL); // Fill the inner circle
+        joystickPaint = new Paint();
+        joystickPaint.setColor(Color.argb(128, 128, 128, 128)); // Half-transparent gray
+        joystickPaint.setStyle(Paint.Style.FILL); // Fill the circle
+
+        attackButtonPaint = new Paint();
+        attackButtonPaint.setColor(Color.argb(128, 128, 128, 128)); // Half-transparent gray
+        attackButtonPaint.setStyle(Paint.Style.FILL);
+        // Inside PlayingUI constructor:
+        innerCirclePaint.setColor(Color.rgb(160, 160, 160)); // Lighter shade of gray
+        innerCirclePaint.setStyle(Paint.Style.FILL); // Fill the inner circle
+        swordImage = BitmapFactory.decodeResource(MainActivity.getGameContext().getResources(), R.drawable.sword_image); // Replace with your sword image resource
         // Initialize the menu button with the appropriate dimensions
         btnPause = new CustomButton(5, 5, ButtonImages.PLAYING_PAUSE.getWidth(), ButtonImages.PLAYING_PAUSE.getHeight());
     }
@@ -76,9 +86,16 @@ public class PlayingUI {
      */
     private void drawUI(Canvas c) {
         // Draw the joystick and attack button as circles
-        c.drawCircle(joystickCenterPos.x, joystickCenterPos.y, radius, circlePaint);
-        c.drawCircle(attackBtnCenterPos.x, attackBtnCenterPos.y, radius, circlePaint);
-
+        c.drawCircle(joystickCenterPos.x, joystickCenterPos.y, radius, joystickPaint);
+        c.drawCircle(attackBtnCenterPos.x, attackBtnCenterPos.y, radius, attackButtonPaint);
+        // Draw the attack button with different colors based on state
+        if (attackBtnPointerId != -1) {
+            // Pushed state: Draw a darker circle
+            attackButtonPaint.setColor(Color.argb(128, 80, 80, 80)); // Darker gray
+        } else {
+            // Normal state: Draw the original circle
+            attackButtonPaint.setColor(Color.argb(128, 128, 128, 128)); // Original gray
+        }
         // Draw the inner circle if the joystick is being touched
         if (touchDown) {
             int pointerIndex = event.findPointerIndex(joystickPointerId); // Find index of joystick touch
@@ -90,6 +107,11 @@ public class PlayingUI {
                 c.drawCircle(innerCircleX, innerCircleY, radius / 2, innerCirclePaint);
             }
         }
+
+        c.drawBitmap(swordImage,
+                attackBtnCenterPos.x - swordImage.getWidth() / 2,
+                attackBtnCenterPos.y - swordImage.getHeight() / 2,
+                null);
 
         // Draw the menu button
         c.drawBitmap(

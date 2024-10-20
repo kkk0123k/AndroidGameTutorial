@@ -135,7 +135,8 @@ public class Menu extends BaseState implements GameStateInterface {
                 exit();
                 game.resetPlaying(user.getProgression());
             } else if (isIn(event, btnSettings) && btnSettings.isPushed()) {
-
+                game.setCurrentGameState(Game.GameState.SETTINGS);
+                game.enterCurrentState();
             }
 
             // Resets the pushed state of the buttons

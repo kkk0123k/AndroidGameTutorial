@@ -32,9 +32,11 @@ public class Game {
     private final GameLoop gameLoop; // Manages the game loop
     private GameState currentGameState = GameState.MENU; // Current game state
     public final SoundManager soundManager;
+    private GameState previousGameState;
     SessionHandler sessionHandler = new SessionHandler(getGameContext());
     User user = sessionHandler.getUserDetails();
     String progression = user.getProgression();
+
 
     /**
      * Constructs the Game instance with the specified SurfaceHolder.
@@ -98,7 +100,7 @@ public class Game {
         deathScreen = new DeathScreen(this); // Initializes the death screen state
         victoryScreen = new VictoryScreen(this);
         pauseState = new PauseState(this);
-        settingScreen = new SettingScreen(this);
+        settingScreen = new SettingScreen(this, soundManager);
         enterCurrentState(); // Call enterCurrentState() after initialization
     }
 
@@ -156,6 +158,7 @@ public class Game {
             case DEATH_SCREEN -> deathScreen.touchEvents(event); // Handle touch events for death screen
             case VICTORY_SCREEN -> victoryScreen.touchEvents(event);
             case PAUSE -> pauseState.touchEvents(event);
+            case SETTINGS -> settingScreen.touchEvents(event);
         }
 
         return true; // Event handled
@@ -183,13 +186,23 @@ public class Game {
     public GameState getCurrentGameState() {
         return currentGameState; // Returns current game state
     }
-
+    /**
+     * Gets the previous game state.
+     *
+     * @return The previous game state.
+     */
+    public GameState getPreviousGameState() {
+        return previousGameState;
+    }
     /**
      * Sets the current game state.
      *
      * @param currentGameState The new game state to set.
      */
     public void setCurrentGameState(GameState currentGameState) {
+        if (currentGameState == GameState.SETTINGS) {
+            previousGameState = this.currentGameState; // Save the previous state
+        }
         this.currentGameState = currentGameState; // Sets current game state
     }
 

@@ -23,8 +23,8 @@ public enum ButtonImages implements BitmapMethods {
     MENU_MENU(R.drawable.mainmenu_button_menu, 300, 140),
     MENU_REPLAY(R.drawable.mainmenu_button_replay, 300, 140),
     PLAYING_PAUSE(R.drawable.pause_button,140,140),
-
     PLAYING_RESUME(R.drawable.playing_button_resume,300,140),
+    SETTING_BACK(R.drawable.settings_button_back,300,140),
     VICTORY_NEXT(R.drawable.victory_button_next,300,140);
 
     // Private instance variables to hold width, height, and bitmap representations of the button states.

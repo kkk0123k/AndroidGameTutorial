@@ -117,7 +117,6 @@ public class PauseState extends BaseState implements GameStateInterface {
             }
             btnResume.setPushed(false);
             btnMainMenu.setPushed(false);
-            btnSettings.setPushed(false);
         }
     }
 
