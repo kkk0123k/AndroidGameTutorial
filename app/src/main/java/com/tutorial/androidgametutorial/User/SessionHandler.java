@@ -53,7 +53,8 @@ public class SessionHandler {
     }
 
     public void updateProgression(String username, String newProgression) {
-        String url = "http://192.168.1.3/member/update.php"; // Replace with your server address
+        String url = "https://united-picked-anteater.ngrok-free.app/member/update.php";
+        ; // Replace with your server address
 
         HashMap<String, String> params = new HashMap<>();
         params.put("username", username);

@@ -7,25 +7,34 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
+import android.graphics.Typeface;
 import android.view.MotionEvent;
+
+import androidx.core.content.res.ResourcesCompat;
 
 import com.tutorial.androidgametutorial.Music.SoundManager;
 import com.tutorial.androidgametutorial.R;
 import com.tutorial.androidgametutorial.entities.Player;
+import com.tutorial.androidgametutorial.environments.Stages;
 import com.tutorial.androidgametutorial.gamestates.Playing;
 import com.tutorial.androidgametutorial.main.MainActivity;
 
 public class PlayingUI {
 
     // For UI element positions and properties
+
     private final PointF joystickCenterPos = new PointF(); // Center position of the joystick
     private final PointF attackBtnCenterPos = new PointF(); // Center position of the attack button
     private final float radius = 150; // Radius for both joystick and attack button UI
     private final Paint joystickPaint; // Paint object for drawing the joystick
     private final Paint attackButtonPaint; // Paint object for drawing the attack button
+    private final Paint textPaint = new Paint();
     private final Paint innerCirclePaint = new Paint();
     private final SoundManager soundManager;
+    private final String progression;
+    Stages stage;
     private Bitmap swordImage;
+    Typeface customFont = ResourcesCompat.getFont(MainActivity.getGameContext(), R.font.minimal_pixel_font);
 
     // For handling multitouch
     private int joystickPointerId = -1; // Pointer ID for the joystick interaction
@@ -46,9 +55,12 @@ public class PlayingUI {
      *
      * @param playing The Playing class instance, controlling the game's main logic and player interaction.
      */
-    public PlayingUI(Playing playing, SoundManager soundManager) {
+    public PlayingUI(Playing playing, String progression, SoundManager soundManager) {
         this.playing = playing;
         this.soundManager = soundManager;
+        this.progression = progression;
+        stage = Stages.valueOf(progression); // Get the stage based on progression
+
         // Calculate joystick position based on screen dimensions
         joystickCenterPos.set(MainActivity.GAME_WIDTH * 0.1f, MainActivity.GAME_HEIGHT * 0.8f);
 
@@ -68,6 +80,10 @@ public class PlayingUI {
         swordImage = BitmapFactory.decodeResource(MainActivity.getGameContext().getResources(), R.drawable.sword_image); // Replace with your sword image resource
         // Initialize the menu button with the appropriate dimensions
         btnPause = new CustomButton(5, 5, ButtonImages.PLAYING_PAUSE.getWidth(), ButtonImages.PLAYING_PAUSE.getHeight());
+        textPaint.setColor(Color.WHITE); // Set text color to white
+        textPaint.setTextSize(100f); // Set text size to 50 pixels
+        textPaint.setTypeface(customFont); // Set the custom font
+        textPaint.setTextAlign(Paint.Align.RIGHT); // Align text to the right
     }
 
     /**
@@ -108,6 +124,12 @@ public class PlayingUI {
             }
         }
 
+        // Draw the text in the top right corner
+        String text = stage.getCurrentLevel(); // Replace with your desired text
+        float x = MainActivity.GAME_WIDTH - (MainActivity.GAME_WIDTH * 0.05f); // 5% from the right edge
+        float y = MainActivity.GAME_HEIGHT * 0.1f; // 5% from the top edge + text size
+        c.drawText(text, x, y, textPaint);
+
         c.drawBitmap(swordImage,
                 attackBtnCenterPos.x - swordImage.getWidth() / 2,
                 attackBtnCenterPos.y - swordImage.getHeight() / 2,
@@ -121,7 +143,6 @@ public class PlayingUI {
                 null);
 
         // Draw the player's health icons
-
         drawHealth(c);
     }
 

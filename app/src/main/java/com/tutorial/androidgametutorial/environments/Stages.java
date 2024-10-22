@@ -208,6 +208,10 @@ public enum Stages {
         return gameObjects;
     }
 
+    public String getCurrentLevel() {
+        return currentLevel;
+    }
+
     public int getNumOfOutsideEnemy() {
         return NumOfOutsideEnemy;
     }

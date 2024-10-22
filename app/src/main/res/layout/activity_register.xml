@@ -7,6 +7,7 @@
     android:gravity="center_vertical"
     android:orientation="vertical"
     android:padding="50dp"
+    android:textColor="@color/black"
     tools:context="com.tutorial.androidgametutorial.User.RegisterActivity">
 
     <TextView
@@ -27,20 +28,29 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="5dp"
+        android:autofillHints=""
         android:background="@android:color/white"
         android:hint="@string/full_name"
         android:inputType="textPersonName"
-        android:padding="10dp" />
+        android:minHeight="48dp"
+        android:padding="10dp"
+        android:textColor="@color/black"
+        android:textColorHint="#757575"/>
 
     <EditText
         android:id="@+id/etUsername"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="5dp"
+        android:autofillHints=""
         android:background="@android:color/white"
         android:hint="@string/username"
         android:inputType="textPersonName"
-        android:padding="10dp" />
+        android:minHeight="48dp"
+        android:padding="10dp"
+        android:textColor="@color/black"
+        android:textColorHint="#757575"
+        />
 
 
     <EditText
@@ -48,20 +58,30 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="5dp"
+        android:autofillHints=""
         android:background="@android:color/white"
         android:hint="@string/password"
         android:inputType="textPassword"
-        android:padding="10dp" />
+        android:minHeight="48dp"
+        android:padding="10dp"
+        android:textColor="@color/black"
+        android:textColorHint="#757575"
+        />
 
     <EditText
         android:id="@+id/etConfirmPassword"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="5dp"
+        android:autofillHints=""
         android:background="@android:color/white"
         android:hint="@string/confirm_password"
         android:inputType="textPassword"
-        android:padding="10dp" />
+        android:minHeight="48dp"
+        android:padding="10dp"
+        android:textColor="@color/black"
+        android:textColorHint="#757575"
+        />
 
     <Button
         android:id="@+id/btnRegister"
@@ -70,7 +90,7 @@
         android:layout_margin="5dp"
         android:background="#f05924"
         android:text="@string/register"
-        android:textColor="@android:color/white" />
+        android:textColor="#212121" />
 
     <TextView
         android:layout_width="match_parent"
@@ -87,6 +107,6 @@
         android:layout_margin="5dp"
         android:background="#aaa"
         android:text="@string/log_in"
-        android:textColor="@android:color/white" />
+        android:textColor="#4E342E" />
 
 </LinearLayout>

@@ -37,7 +37,7 @@ public class RegisterActivity extends AppCompatActivity {
     private String confirmPassword;
     private String fullName;
     private ProgressDialog pDialog;
-    private final String register_url = "http://192.168.1.3/member/register.php";
+    private final String register_url = "https://united-picked-anteater.ngrok-free.app/member/register.php";
     private SessionHandler session;
 
     @Override

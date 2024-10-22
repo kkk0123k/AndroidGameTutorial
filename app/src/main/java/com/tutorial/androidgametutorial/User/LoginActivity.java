@@ -33,7 +33,7 @@ public class LoginActivity extends AppCompatActivity {
     private String username;
     private String password;
     private ProgressDialog pDialog;
-    private final String login_url = "http://192.168.1.3/member/login.php";
+    private final String login_url = "https://united-picked-anteater.ngrok-free.app/member/login.php";
     private SessionHandler session;
 
     @Override

@@ -67,7 +67,7 @@ public class Playing extends BaseState implements GameStateInterface {
         player = new Player();
         stage = Stages.valueOf(progression);
 
-        playingUI = new PlayingUI(this, soundManager);
+        playingUI = new PlayingUI(this, progression, soundManager);
 
         redPaint = new Paint();
         redPaint.setStrokeWidth(1);

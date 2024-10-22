@@ -24,9 +24,11 @@
         android:background="@android:color/white"
         android:hint="@string/username"
         android:inputType="textPersonName"
+        android:textColor="@color/black"
         android:minHeight="48dp"
-        android:padding="10dp" />
-
+        android:padding="10dp"
+        android:textColorHint="#757575"
+        />
 
     <EditText
         android:id="@+id/etLoginPassword"
@@ -35,9 +37,12 @@
         android:layout_margin="5dp"
         android:background="@android:color/white"
         android:hint="@string/password"
+        android:textColor="@color/black"
         android:inputType="textPassword"
         android:minHeight="48dp"
-        android:padding="10dp" />
+        android:padding="10dp"
+        android:textColorHint="#757575"
+        />
 
     <Button
         android:id="@+id/btnLogin"

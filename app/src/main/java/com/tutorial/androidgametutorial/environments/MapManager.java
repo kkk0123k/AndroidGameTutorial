@@ -21,7 +21,6 @@ public class MapManager {
     private GameMap currentMap;
     private float cameraX, cameraY;
     private final Playing playing;
-    private final String progression;
     private List<GameMap> allMaps = new ArrayList<>(); // Store all maps
     /**
      * Constructs a MapManager to manage the game's maps and camera.
@@ -30,7 +29,6 @@ public class MapManager {
      */
     public MapManager(Playing playing, String progression) {
         this.playing = playing;
-        this.progression = progression;
         initStage(progression);
     }
 
@@ -184,9 +182,6 @@ public class MapManager {
         if (insideMaps != null && !insideMaps.isEmpty()) {
             Random random = new Random();
 
-            // Create a list to hold the inside maps
-            int totalEnemiesAssigned = 0; // Track total enemies assigned
-
             // Calculate the average number of enemies per map
             int averageEnemiesPerMap = NumberOfEnemyInside / insideMaps.size();
             int remainingEnemies = NumberOfEnemyInside % insideMaps.size();
@@ -204,8 +199,6 @@ public class MapManager {
             for (int i = 0; i < insideMaps.size(); i++) {
                 int[][] currentInsideArray = insideMaps.get(i);
                 int numEnemies = enemiesPerMap[i];
-
-                totalEnemiesAssigned += numEnemies;
 
                 // Create a new GameMap for each inside map
                 GameMap insideMap = new GameMap(
